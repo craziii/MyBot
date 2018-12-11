@@ -14,13 +14,17 @@ import static java.lang.String.format;
 import static net.dv8tion.jda.core.AccountType.BOT;
 
 @Component
-public class Starter {
+public final class Starter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
     private static final String TOKEN = "NTIxNzcxOTcwMzEyNzk4MjA4.DvBYaw.Vcj_1pknsezTXo_ZN2Nx8NKLER8";
 
+    private final Environment environment;
+
     @Autowired
-    private Environment environment;
+    public Starter(final Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void init() {

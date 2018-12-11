@@ -29,7 +29,7 @@ repositories {
 dependencies {
 	compile group: 'org.springframework.integration', name: 'spring-integration-core', version: '5.1.1.RELEASE'
 	compile 'net.dv8tion:JDA:3.5.0_329'
-	
+
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')

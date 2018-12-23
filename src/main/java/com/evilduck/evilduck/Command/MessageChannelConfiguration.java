@@ -1,14 +1,22 @@
 package com.evilduck.evilduck.Command;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowDefinition;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.MessageChannel;
 
+@Configuration
+@EnableIntegration
 public class MessageChannelConfiguration {
 
     @Bean
-    public IntegrationFlow pingFlow() {
-        return IntegrationFlowDefinition::log;
+    public MessageChannel commandInputChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MessageChannel pingChannel() {
+        return new DirectChannel();
     }
 }

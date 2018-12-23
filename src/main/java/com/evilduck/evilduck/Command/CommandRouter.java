@@ -3,21 +3,26 @@ package com.evilduck.evilduck.Command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.Router;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CommandRouter extends Router {
+public class CommandRouter {
 
-    private CommandFormatter commandFormatter;
+    private final CommandFormatter commandFormatter;
+    private final MessageChannel pingChannel;
 
     @Autowired
-    public CommandRouter(CommandFormatter commandFormatter) {
+    public CommandRouter(final CommandFormatter commandFormatter,
+                         final MessageChannel pingChannel) {
         this.commandFormatter = commandFormatter;
+        this.pingChannel = pingChannel;
     }
 
     @Router
     public IntegrationFlow commandFlow() {
-        return f -> f.transform(commandFormatter).channel();
+        return f -> f.transform(commandFormatter)
+                .channel(pingChannel);
     }
 
 

@@ -20,10 +20,13 @@ public final class Starter {
     private static final String TOKEN = "NTIxNzcxOTcwMzEyNzk4MjA4.DvBYaw.Vcj_1pknsezTXo_ZN2Nx8NKLER8";
 
     private final Environment environment;
+    private final MessageListener messageListenerBean;
 
     @Autowired
-    public Starter(final Environment environment) {
+    public Starter(final Environment environment,
+                   final MessageListener messageListenerBean) {
         this.environment = environment;
+        this.messageListenerBean = messageListenerBean;
     }
 
     @PostConstruct
@@ -35,7 +38,7 @@ public final class Starter {
 
         final JDABuilder jdaBuilder = new JDABuilder(BOT)
                 .setToken(TOKEN)
-                .addEventListener(new TestMain());
+                .addEventListener(messageListenerBean);
 
         try {
             jdaBuilder.buildAsync();

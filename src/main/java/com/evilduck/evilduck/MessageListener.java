@@ -20,13 +20,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(final MessageReceivedEvent event) {
-        System.out.printf("Received message from author: %s : %s",
-                event.getAuthor().getName(),
-                event.getMessage().getContentDisplay());
-        final String rawCommand = event.getMessage().getContentRaw();
-        if (rawCommand.equals("!ping"))
-            event.getChannel().sendMessage("Lol Isaac is the big gay! 8======D").queue();
-        commandGateway.processCommand(withPayload(rawCommand).build());
+        commandGateway.processCommand(withPayload(event.getMessage()).build());
     }
 
 }

@@ -1,25 +1,26 @@
 package com.evilduck.evilduck.Command;
 
-import org.springframework.integration.transformer.Transformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.integration.annotation.Transformer;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import static java.util.Arrays.asList;
 import static org.springframework.messaging.support.MessageBuilder.withPayload;
 
 @Component
-public class CommandFormatter implements Transformer {
+public class CommandFormatter {
 
-    @Override
-    public Message<?> transform(final Message<?> message) {
-        final String messagePayload = (String) message.getPayload();
-        final String[] commandArgs = getCommandArgs(messagePayload);
-        final Command command = new Command(commandArgs[0], asList(messagePayload.replaceFirst("!.* ", "").split(" ")));
-        return withPayload(command).build();
+    private final static Logger LOGGER = LoggerFactory.getLogger(CommandFormatter.class);
+
+    @Transformer
+    public Message<net.dv8tion.jda.core.entities.Message> transform(final Message<net.dv8tion.jda.core.entities.Message> message) {
+        LOGGER.info("Transforming message {}", message.getPayload().getId());
+        return withPayload(message.getPayload()).setHeader("args", getCommandArgs(message.getPayload().getContentRaw())).build();
     }
 
-    private static String[] getCommandArgs(final String commandString) {
-        return commandString.replace("!", "").split(" ");
+    private static int getCommandArgs(final String commandString) {
+        return commandString.replace("!", "").split(" ").length;
     }
 
 }

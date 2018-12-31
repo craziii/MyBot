@@ -1,5 +1,6 @@
 package com.evilduck.evilduck;
 
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

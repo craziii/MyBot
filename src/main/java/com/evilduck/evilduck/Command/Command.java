@@ -1,24 +1,10 @@
 package com.evilduck.evilduck.Command;
 
-import java.util.List;
 
-public class Command {
+import org.springframework.messaging.Message;
 
-    private final String command;
-    private final List<String> args;
+public interface Command {
 
-    public Command(final String command,
-                   final List<String> args) {
-        this.command = command;
-        this.args = args;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public List<String> getArgs() {
-        return args;
-    }
+    void execute(final Message<net.dv8tion.jda.core.entities.Message> message);
 
 }

@@ -8,6 +8,6 @@ import org.springframework.messaging.Message;
 public interface CommandGateway {
 
     @Gateway
-    void processCommand(final Message<String> message);
+    void processCommand(final Message<net.dv8tion.jda.core.entities.Message> message);
 
 }

@@ -25,7 +25,6 @@ repositories {
 
 }
 
-
 dependencies {
 	compile group: 'org.springframework.integration', name: 'spring-integration-core', version: '5.1.1.RELEASE'
 	compile 'net.dv8tion:JDA:3.5.0_329'

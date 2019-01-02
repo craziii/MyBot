@@ -9,18 +9,22 @@ import org.springframework.stereotype.Component;
 import static org.springframework.messaging.support.MessageBuilder.withPayload;
 
 @Component
-public class CommandFormatter {
+public class CommandArgsLengthParser {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CommandFormatter.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CommandArgsLengthParser.class);
 
     @Transformer
     public Message<net.dv8tion.jda.core.entities.Message> transform(final Message<net.dv8tion.jda.core.entities.Message> message) {
         LOGGER.info("Transforming message {}", message.getPayload().getId());
-        return withPayload(message.getPayload()).setHeader("args", getCommandArgs(message.getPayload().getContentRaw())).build();
+        return withPayload(message.getPayload())
+                .setHeader("args", getCommandArgs(message.getPayload().getContentRaw()))
+                .build();
     }
 
-    private static int getCommandArgs(final String commandString) {
-        return commandString.replace("!", "").split(" ").length;
+    private static String[] getCommandArgs(final String commandString) {
+        return commandString.replace("!", "")
+                .replaceFirst(" ", "")
+                .split(" ");
     }
 
 }

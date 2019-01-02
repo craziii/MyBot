@@ -44,7 +44,7 @@ public final class Starter {
         try {
             jdaBuilder.buildAsync();
         } catch (LoginException e) {
-            LOGGER.error("Unable to build JDABuilder, cause,\n%s",
+            LOGGER.error("Unable to build JDABuilder, cause:\n%s",
                     e.getMessage());
             e.printStackTrace();
         }

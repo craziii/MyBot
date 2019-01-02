@@ -19,4 +19,10 @@ public class MessageChannelConfiguration {
     public MessageChannel pingChannel() {
         return new DirectChannel();
     }
+
+    @Bean
+    public MessageChannel penisChannel() {
+        return new DirectChannel();
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.evilduck.evilduck;
 
-import com.evilduck.evilduck.Command.CommandGateway;
+import com.evilduck.evilduck.CommandConfiguration.CommandGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

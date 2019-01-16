@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Command;
+package com.evilduck.evilduck.CommandConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,22 +9,18 @@ import org.springframework.stereotype.Component;
 import static org.springframework.messaging.support.MessageBuilder.withPayload;
 
 @Component
-public class CommandArgsLengthParser {
+public class CommandFormatter {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(CommandArgsLengthParser.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CommandFormatter.class);
 
     @Transformer
     public Message<net.dv8tion.jda.core.entities.Message> transform(final Message<net.dv8tion.jda.core.entities.Message> message) {
         LOGGER.info("Transforming message {}", message.getPayload().getId());
-        return withPayload(message.getPayload())
-                .setHeader("args", getCommandArgs(message.getPayload().getContentRaw()))
-                .build();
+        return withPayload(message.getPayload()).setHeader("args", getCommandArgs(message.getPayload().getContentRaw())).build();
     }
 
-    private static String[] getCommandArgs(final String commandString) {
-        return commandString.replace("!", "")
-                .replaceFirst(" ", "")
-                .split(" ");
+    private static int getCommandArgs(final String commandString) {
+        return commandString.replace("!", "").split(" ").length;
     }
 
 }

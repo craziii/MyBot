@@ -24,5 +24,4 @@ public class MessageChannelConfiguration {
     public MessageChannel penisChannel() {
         return new DirectChannel();
     }
-
 }

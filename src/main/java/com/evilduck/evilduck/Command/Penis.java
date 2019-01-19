@@ -12,9 +12,8 @@ public class Penis implements GenericCommand {
     @ServiceActivator(inputChannel = "penisChannel")
     public void execute(org.springframework.messaging.Message<Message> message) {
         final TextChannel originChannel = message.getPayload().getTextChannel();
-        final int penisLength = message.getPayload().getAuthor().getName().equals("DuckChan") ? 100 : 1;
+        final int penisLength = message.getPayload().getAuthor().getName().matches("DuckChan|Unstable Sloth") ? 100 : 1;
 
         originChannel.sendMessage(":eggplant: Your Penis length is " + penisLength + " inches long :3").queue();
-
     }
 }

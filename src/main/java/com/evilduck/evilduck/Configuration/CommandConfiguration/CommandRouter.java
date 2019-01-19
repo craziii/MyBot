@@ -1,5 +1,7 @@
-package com.evilduck.evilduck.CommandConfiguration;
+package com.evilduck.evilduck.Configuration.CommandConfiguration;
 
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +20,19 @@ public class CommandRouter {
     private final MessageChannel commandInputChannel;
     private final MessageChannel pingChannel;
     private final MessageChannel penisChannel;
+    private final JDA jda;
 
     @Autowired
     public CommandRouter(final CommandFormatter commandFormatter,
                          final MessageChannel commandInputChannel,
                          final MessageChannel pingChannel,
-                         final MessageChannel penisChannel) {
+                         final MessageChannel penisChannel,
+                         final JDA jda) {
         this.commandFormatter = commandFormatter;
         this.commandInputChannel = commandInputChannel;
         this.pingChannel = pingChannel;
         this.penisChannel = penisChannel;
+        this.jda = jda;
     }
 
     @Bean
@@ -35,6 +40,7 @@ public class CommandRouter {
         return IntegrationFlows.from(commandInputChannel)
                 .transform(commandFormatter)
                 .log("info")
+                .filter((Message p) -> !p.getAuthor().getDiscriminator().equals(jda.getSelfUser().getDiscriminator()))
                 .<net.dv8tion.jda.core.entities.Message, String>route(p -> p.getContentRaw().replace("!", ""),
                         m -> m.channelMapping("ping", "pingChannel")
                 .channelMapping("penis", "penisChannel"))

@@ -8,7 +8,7 @@ public class PrettyDate {
 
     private final DateTime dateTime;
 
-    public PrettyDate(final DateTime dateTime) {
+    PrettyDate(final DateTime dateTime) {
         this.dateTime = dateTime;
     }
 

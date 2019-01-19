@@ -24,7 +24,7 @@ public class HealthReport {
         this.jda = jda;
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60000)
     public void healthReport() {
         LOGGER.info("\n\n");
         LOGGER.info("Health Report:\t{}", new PrettyDate(DateTime.now()));

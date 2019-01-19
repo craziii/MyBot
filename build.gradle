@@ -29,7 +29,8 @@ dependencies {
 	compile group: 'org.springframework.integration', name: 'spring-integration-core', version: '5.1.1.RELEASE'
 	compile group: 'joda-time', name: 'joda-time', version: '2.3'
 	compile 'net.dv8tion:JDA:3.5.0_329'
-
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
+	testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation('org.springframework.boot:spring-boot-starter-webflux')

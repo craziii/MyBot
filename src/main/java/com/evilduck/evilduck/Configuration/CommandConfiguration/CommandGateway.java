@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.CommandConfiguration;
+package com.evilduck.evilduck.Configuration.CommandConfiguration;
 
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;

@@ -1,4 +1,4 @@
-package com.evilduck.evilduck;
+package com.evilduck;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

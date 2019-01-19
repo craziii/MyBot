@@ -30,6 +30,8 @@ dependencies {
 	compile group: 'joda-time', name: 'joda-time', version: '2.3'
 	compile 'net.dv8tion:JDA:3.5.0_329'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
+	compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
+
 	testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
 	implementation('org.springframework.boot:spring-boot-starter-web')

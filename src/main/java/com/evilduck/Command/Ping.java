@@ -1,5 +1,6 @@
-package com.evilduck.evilduck.Command;
+package com.evilduck.Command;
 
+import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;

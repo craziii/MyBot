@@ -1,4 +1,4 @@
-package com.evilduck.evilduck;
+package com.evilduck;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDABuilder;

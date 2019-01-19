@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Configuration.CommandConfiguration;
+package com.evilduck.Configuration.CommandConfiguration;
 
 public enum CommandType {
 

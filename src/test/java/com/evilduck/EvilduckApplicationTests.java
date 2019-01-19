@@ -1,4 +1,4 @@
-package com.evilduck.evilduck;
+package com.evilduck;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

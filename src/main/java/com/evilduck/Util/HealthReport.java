@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Util;
+package com.evilduck.Util;
 
 import net.dv8tion.jda.core.JDA;
 import org.joda.time.DateTime;

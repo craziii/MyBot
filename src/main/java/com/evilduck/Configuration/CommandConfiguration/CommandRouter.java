@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Configuration.CommandConfiguration;
+package com.evilduck.Configuration.CommandConfiguration;
 
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
@@ -10,6 +10,8 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
+
+import java.util.List;
 
 @MessageEndpoint
 public class CommandRouter {
@@ -43,8 +45,13 @@ public class CommandRouter {
                 .filter((Message p) -> !p.getAuthor().getDiscriminator().equals(jda.getSelfUser().getDiscriminator()))
                 .<net.dv8tion.jda.core.entities.Message, String>route(p -> p.getContentRaw().replace("!", ""),
                         m -> m.channelMapping("ping", "pingChannel")
-                .channelMapping("penis", "penisChannel"))
+                                .channelMapping("penis", "penisChannel"))
                 .get();
+    }
+
+    private static List<String> getAliasesForCommand(final String fullCommand) {
+
+        return null;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Exceptions;
+package com.evilduck.Exception;
 
 import java.io.IOException;
 

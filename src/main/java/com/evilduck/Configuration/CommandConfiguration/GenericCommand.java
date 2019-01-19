@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Command;
+package com.evilduck.Configuration.CommandConfiguration;
 
 
 import org.springframework.messaging.Message;

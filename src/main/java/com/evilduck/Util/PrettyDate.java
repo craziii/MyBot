@@ -1,4 +1,4 @@
-package com.evilduck.evilduck.Util;
+package com.evilduck.Util;
 
 import org.joda.time.DateTime;
 

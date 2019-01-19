@@ -10,22 +10,35 @@ import static java.util.Arrays.asList;
 
 public class CommandDetail {
 
-    @Id public String id;
+    @Id
+    public String id;
 
-    private final String fullCommand;
-    private final List<String> aliases;
+    private String fullCommand;
+    private List<String> aliases;
 
     public CommandDetail(final String fullCommand) {
-        this.fullCommand = fullCommand;
+        this.fullCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, fullCommand);
         aliases = new ArrayList<>();
     }
 
+    public String getFullCommand() {
+        return fullCommand;
+    }
+
+    public void setFullCommand(String fullCommand) {
+        this.fullCommand = fullCommand;
+    }
+
     public List<String> getAliases() {
-        getCamelCaseAlias();
+        generateCamelCaseAlias();
         return aliases;
     }
 
-    private void getCamelCaseAlias() {
+    public void setAliases(List<String> aliases) {
+        this.aliases = aliases;
+    }
+
+    public void generateCamelCaseAlias() {
         final String snakeCaseCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fullCommand);
         final List<Character> firstLetters = new ArrayList<>();
         asList(snakeCaseCommand.split("_")).forEach(word -> firstLetters.add(word.charAt(0)));

@@ -1,6 +1,7 @@
 package com.evilduck;
 
 import com.evilduck.Entity.CommandDetail;
+import com.evilduck.Repository.CommandDetailRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,12 @@ public final class Starter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
     private final Environment environment;
-    private final MongoRepository mongoRepository;
+    private final CommandDetailRepository mongoRepository;
     private final String commandPackage;
 
     @Autowired
     public Starter(final Environment environment,
-                   final MongoRepository mongoRepository,
+                   final CommandDetailRepository mongoRepository,
                    @Value("${command.package}")final String commandPackage) {
         this.environment = environment;
         this.mongoRepository = mongoRepository;
@@ -53,7 +54,7 @@ public final class Starter {
                 .getContextClassLoader()
                 .getResources(commandPackage.replace(".", "/"));
 
-        final List<CommandDetail> classNames = new ArrayList<>();
+        final List<CommandDetail> commandDetailList = new ArrayList<>();
 
         while(resources.hasMoreElements()) {
             final File shouldBeDirectory = new File(((URL) resources.nextElement()).getFile());
@@ -62,12 +63,14 @@ public final class Starter {
                 final File[] files = shouldBeDirectory.listFiles();
                 assert files != null;
                 for (final File file : files) {
-                    classNames.add(
+                    commandDetailList.add(
                             new CommandDetail(file.getName().replace(".class", ""))
                     );
                 }
             }
-            mongoRepository.insert(classNames);
+            commandDetailList.forEach(CommandDetail::generateCamelCaseAlias);
+            mongoRepository.deleteAll();
+            mongoRepository.saveAll(commandDetailList);
         }
 
     }

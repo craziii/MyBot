@@ -1,17 +1,19 @@
 package com.evilduck.Configuration.CommandConfiguration;
 
+import com.evilduck.Repository.CommandDetailRepository;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.Router;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
-
-import java.util.List;
 
 @MessageEndpoint
 public class CommandRouter {
@@ -20,20 +22,16 @@ public class CommandRouter {
 
     private final CommandFormatter commandFormatter;
     private final MessageChannel commandInputChannel;
-    private final MessageChannel pingChannel;
-    private final MessageChannel penisChannel;
+    private final CommandDetailRepository commandDetailRepository;
     private final JDA jda;
 
     @Autowired
     public CommandRouter(final CommandFormatter commandFormatter,
                          final MessageChannel commandInputChannel,
-                         final MessageChannel pingChannel,
-                         final MessageChannel penisChannel,
-                         final JDA jda) {
+                         CommandDetailRepository commandDetailRepository, final JDA jda) {
         this.commandFormatter = commandFormatter;
         this.commandInputChannel = commandInputChannel;
-        this.pingChannel = pingChannel;
-        this.penisChannel = penisChannel;
+        this.commandDetailRepository = commandDetailRepository;
         this.jda = jda;
     }
 
@@ -41,17 +39,21 @@ public class CommandRouter {
     public IntegrationFlow commandFlow() {
         return IntegrationFlows.from(commandInputChannel)
                 .transform(commandFormatter)
-                .log("info")
-                .filter((Message p) -> !p.getAuthor().getDiscriminator().equals(jda.getSelfUser().getDiscriminator()))
-                .<net.dv8tion.jda.core.entities.Message, String>route(p -> p.getContentRaw().replace("!", ""),
-                        m -> m.channelMapping("ping", "pingChannel")
-                                .channelMapping("penis", "penisChannel"))
+                .filter((Message p) -> !p.getAuthor().getDiscriminator()
+                        .equals(jda.getSelfUser().getDiscriminator()))
+                .filter((Message p) -> commandDetailRepository
+                        .findOneByFullCommand(p.getContentRaw()
+                                .replace("!", "")) != null)
+                .channel("resolveCommandChannel")
                 .get();
     }
 
-    private static List<String> getAliasesForCommand(final String fullCommand) {
-
-        return null;
+    @Router(inputChannel = "resolveCommandChannel")
+    public String commandChannelRouter(final Object payload) {
+        if (payload instanceof Message) {
+            return ((Message) payload).getContentRaw().replace("!", "") + "Channel";
+        } else
+            throw new TypeMismatchException(payload, Message.class);
     }
 
 }

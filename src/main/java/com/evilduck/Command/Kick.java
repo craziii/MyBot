@@ -43,8 +43,7 @@ public class Kick implements GenericCommand {
             }
 
             guild.getController()
-                    .kick(mentionedMember).queue(
-                    success -> {
+                    .kick(mentionedMember).queue(success -> {
                         mentionedUser.openPrivateChannel().queue(privateChannel ->
                                 privateChannel
                                         .sendMessage("Hahaha, you've been kicked by ***ME!!!***")
@@ -55,9 +54,7 @@ public class Kick implements GenericCommand {
                                 .append(" kicked!").queue();
 
                     },
-                    error -> {
-                        handleKickError(channel, mentionedMember, error);
-                    }
+                    error -> handleKickError(channel, mentionedMember, error)
             );
         }
     }

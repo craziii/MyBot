@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,18 +28,24 @@ public final class Starter {
     private final Environment environment;
     private final CommandDetailRepository mongoRepository;
     private final String commandPackage;
+    private final MessageChannelConfiguration messageChannelConfiguration;
 
     @Autowired
     public Starter(final Environment environment,
                    final CommandDetailRepository mongoRepository,
-                   @Value("${command.package}")final String commandPackage) {
+                   @Value("${command.package}") final String commandPackage,
+                   final MessageChannelConfiguration messageChannelConfiguration) {
         this.environment = environment;
         this.mongoRepository = mongoRepository;
         this.commandPackage = commandPackage;
+        this.messageChannelConfiguration = messageChannelConfiguration;
     }
 
     @PostConstruct
     public void init() throws IOException {
+
+        messageChannelConfiguration.instantiateMessageChannels();
+
         final StringBuilder outputListString = new StringBuilder();
         for (final String defaultProfile : environment.getDefaultProfiles())
             outputListString.append(format("%s\n", defaultProfile));

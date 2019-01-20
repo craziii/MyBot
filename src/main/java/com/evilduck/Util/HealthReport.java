@@ -26,9 +26,11 @@ public class HealthReport {
 
     @Scheduled(fixedRate = 60000)
     public void healthReport() {
-        LOGGER.info("\n\n");
-        LOGGER.info("Health Report:\t{}", new PrettyDate(DateTime.now()));
-        LOGGER.info("Ping:\t\t\t{}ms", jda.getPing());
+        final StringBuilder healthOutput = new StringBuilder();
+        healthOutput.append("\nHealth Report:\t").append(new PrettyDate(DateTime.now()));
+        healthOutput.append("\nPing:\t\t\t").append(jda.getPing() + "ms");
+
+        LOGGER.info(healthOutput.toString());
     }
 
 }

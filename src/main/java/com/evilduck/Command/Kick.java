@@ -5,11 +5,13 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.PermissionException;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 
+@Component
 public class Kick implements GenericCommand {
 
     @Override
@@ -23,6 +25,11 @@ public class Kick implements GenericCommand {
 
         if (!selfMember.hasPermission(KICK_MEMBERS))
             channel.sendMessage("I do not have permission to kick members").queue();
+        else if (mentionedUsers.size() == 0)
+            channel.sendMessage("Please mention the user you want to kick").queue();
+        else if (mentionedUsers.size() > 1)
+            channel.sendMessage("Please only specify one user to kick at a time").queue();
+
 
         for (final User mentionedUser : mentionedUsers) {
             final Member mentionedMember = guild.getMember(mentionedUser);
@@ -37,10 +44,17 @@ public class Kick implements GenericCommand {
 
             guild.getController()
                     .kick(mentionedMember).queue(
-                    success -> channel
-                            .sendMessage("Member ")
-                            .append(effectiveName)
-                            .append(" kicked!").queue(),
+                    success -> {
+                        mentionedUser.openPrivateChannel().queue(privateChannel ->
+                                privateChannel
+                                        .sendMessage("Hahaha, you've been kicked by ***ME!!!***")
+                                        .queue());
+                        channel
+                                .sendMessage("Member ")
+                                .append(effectiveName)
+                                .append(" kicked!").queue();
+
+                    },
                     error -> {
                         handleKickError(channel, mentionedMember, error);
                     }

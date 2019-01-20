@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Router;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
@@ -42,8 +41,7 @@ public class CommandRouter {
                 .filter((Message p) -> !p.getAuthor().getDiscriminator()
                         .equals(jda.getSelfUser().getDiscriminator()))
                 .filter((Message p) -> commandDetailRepository
-                        .findOneByFullCommand(p.getContentRaw()
-                                .replace("!", "")) != null)
+                        .findOneByFullCommand(getCommandString(p.getContentRaw())) != null)
                 .channel("resolveCommandChannel")
                 .get();
     }
@@ -51,9 +49,13 @@ public class CommandRouter {
     @Router(inputChannel = "resolveCommandChannel")
     public String commandChannelRouter(final Object payload) {
         if (payload instanceof Message) {
-            return ((Message) payload).getContentRaw().replace("!", "") + "Channel";
+            return getCommandString(((Message) payload).getContentRaw()) + "Channel";
         } else
             throw new TypeMismatchException(payload, Message.class);
+    }
+
+    private String getCommandString(final String rawCommand) {
+        return rawCommand.replace("!", "").split(" ")[0];
     }
 
 }

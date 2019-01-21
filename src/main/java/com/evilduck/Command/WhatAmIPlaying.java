@@ -32,8 +32,7 @@ public class WhatAmIPlaying implements GenericCommand {
                     .sendMessage("You must specify a what Im playing!")
                     .queue();
 
-        final Game gameImPlaying = Game.of(LISTENING, whatImPlaying.orElse("Listening..."));
-        message.getPayload().getJDA().getPresence().setGame(gameImPlaying);
+        message.getPayload().getJDA().getPresence().setGame(Game.of(LISTENING, whatImPlaying.orElse("Listening...")));
 
     }
 

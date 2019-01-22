@@ -61,12 +61,12 @@ public class Ping implements GenericCommand {
 
     @Override
     public void onSuccess() {
-
+        LOGGER.info("ping display success in guild: {} | in text channel: {}", message.getPayload().getGuild(), message.getPayload().getTextChannel());
     }
 
     @Override
     public void onFail() {
-
+        LOGGER.info("ping display failure in guild: {} | in text channel: {}", message.getPayload().getGuild(), message.getPayload().getTextChannel());
     }
 
     private static class PingIndicator {
@@ -94,5 +94,4 @@ public class Ping implements GenericCommand {
             return pingIcon;
         }
     }
-
 }

@@ -9,6 +9,8 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
+import static java.lang.String.valueOf;
+
 @Component
 public class Ping implements GenericCommand {
 
@@ -23,7 +25,7 @@ public class Ping implements GenericCommand {
 
         originTextChannel.sendMessage(new EmbedBuilder()
                 .setTitle("Ping")
-                .addField("Value (ms)", String.valueOf(pingValue), true)
+                .addField("Value (ms)", valueOf(pingValue), true)
                 .build())
                 .queue();
 

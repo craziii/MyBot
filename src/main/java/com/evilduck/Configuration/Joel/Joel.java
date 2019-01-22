@@ -1,5 +1,13 @@
 package com.evilduck.Configuration.Joel;
 
 public class Joel {
-    public String lol = "lol";
+    private String lol = "lol";
+
+    public String getLol() {
+        return lol;
+    }
+
+    public void setLol(String lol) {
+        this.lol = lol;
+    }
 }

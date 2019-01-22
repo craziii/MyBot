@@ -67,11 +67,8 @@ public final class Starter {
             if (shouldBeDirectory.isDirectory()) {
                 final File[] files = shouldBeDirectory.listFiles();
                 assert files != null;
-                for (final File file : files) {
-                    commandDetailList.add(
-                            new CommandDetail(file.getName().replace(".class", ""))
-                    );
-                }
+                for (final File file : files)
+                    commandDetailList.add(new CommandDetail(file.getName().replace(".class", "")));
             }
             commandDetailList.forEach(CommandDetail::generateCamelCaseAlias);
             mongoRepository.deleteAll();

@@ -11,4 +11,5 @@ public class MessageListenerProvider {
     public MessageListener messageListenerBean(final CommandGateway commandGateway) {
         return new MessageListener(commandGateway);
     }
+    
 }

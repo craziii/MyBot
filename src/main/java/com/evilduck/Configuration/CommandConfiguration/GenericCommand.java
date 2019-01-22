@@ -8,4 +8,7 @@ public interface GenericCommand {
 
     void execute(final Message<net.dv8tion.jda.core.entities.Message> message);
 
+    void onSuccess();
+    void onFail();
+
 }

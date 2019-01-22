@@ -9,8 +9,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import static java.lang.String.valueOf;
-
 @Component
 public class Ping implements GenericCommand {
 
@@ -23,21 +21,48 @@ public class Ping implements GenericCommand {
         final TextChannel originTextChannel = message.getPayload().getTextChannel();
         final long pingValue = message.getPayload().getJDA().getPing();
 
-        originTextChannel.sendMessage(new EmbedBuilder()
-                .setTitle("Ping")
-                .addField("Value (ms)", valueOf(pingValue), true)
+        if(pingValue < 100){
+            originTextChannel.sendMessage(new EmbedBuilder()
+                .withAuthorName("Ping")
+                .setColor(0,255,0)
+                .withAuthorIcon("https://discordapp.com/assets/c6b26ba81f44b0c43697852e1e1d1420.svg")
+                .appendField("Value (ms)", String.valueOf(pingValue), true)
+                .appendField("", "This is definitely a good thing", false)
                 .build())
                 .queue();
+        }
 
-    }
+        if(pingValue > 100 && pingValue <= 250){
+            originTextChannel.sendMessage(new EmbedBuilder()
+                .withAuthorName("Ping")
+                .setColor(255,255,0)
+                .withAuthorIcon("https://i.imgur.com/OsfBMXz.png")
+                .appendField("Value (ms)", String.valueOf(pingValue), true)
+                .appendField("", "This is possibly a small hiccup, but if it persists I'm getting my umbrella", false)
+                .build())
+                .queue();
+        }
 
-    @Override
-    public void onSuccess() {
+        if(pingValue > 250 && pingValue <= 500){
+            originTextChannel.sendMessage(new EmbedBuilder()
+                .withAuthorName("Ping")
+                .setColor(255,165,0)
+                .withAuthorIcon("https://i.imgur.com/22oFoi2.png")
+                .appendField("Value (ms)", String.valueOf(pingValue), true)
+                .appendField("", "This is possibly a small hiccup, but if it persists its getting to be a pretty bad thing", false)
+                .build())
+                .queue();
+        }
 
-    }
-
-    @Override
-    public void onFail() {
-
+        if(pingValue > 500){
+            originTextChannel.sendMessage(new EmbedBuilder()
+                .withAuthorName("Ping")
+                .setColor(255,0,0)
+                .withAuthorIcon("https://discordapp.com/assets/15ccaf984f2fafcf3ed5d896763ed510.svg")
+                .appendField("Value (ms)", String.valueOf(pingValue), true)
+                .appendField("", "This is a bad sign, I gotta be honest", false)
+                .build())
+                .queue();
+        }
     }
 }

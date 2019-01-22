@@ -24,7 +24,7 @@ public class HealthReport {
         this.jda = jda;
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 300000)
     public void healthReport() {
         final StringBuilder healthOutput = new StringBuilder();
         healthOutput.append("\nHealth Report:\t").append(new PrettyDate(DateTime.now()));

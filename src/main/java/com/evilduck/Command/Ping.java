@@ -4,7 +4,6 @@ import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -12,11 +11,12 @@ import org.springframework.stereotype.Component;
 import java.awt.Color;
 
 import static java.lang.String.valueOf;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 public class Ping implements GenericCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
+    private static final Logger LOGGER = getLogger(Ping.class);
 
     @Override
     @ServiceActivator(inputChannel = "pingChannel")

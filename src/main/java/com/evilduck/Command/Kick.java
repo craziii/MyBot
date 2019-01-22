@@ -48,8 +48,7 @@ public class Kick implements GenericCommand {
                                 privateChannel
                                         .sendMessage("Hahaha, you've been kicked by ***ME!!!***")
                                         .queue());
-                        channel
-                                .sendMessage("Member ")
+                        channel.sendMessage("Member ")
                                 .append(effectiveName)
                                 .append(" kicked!").queue();
 

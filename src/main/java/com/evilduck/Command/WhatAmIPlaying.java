@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static net.dv8tion.jda.core.entities.Game.GameType.LISTENING;
 
+//  TODO: WORK IN PROGRESS!
 public class WhatAmIPlaying implements GenericCommand {
 
     private final CommandHelper commandHelper;
@@ -33,6 +34,16 @@ public class WhatAmIPlaying implements GenericCommand {
                     .queue();
 
         message.getPayload().getJDA().getPresence().setGame(Game.of(LISTENING, whatImPlaying.orElse("Listening...")));
+
+    }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFail() {
 
     }
 

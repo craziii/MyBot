@@ -30,4 +30,14 @@ public class Ping implements GenericCommand {
                 .queue();
 
     }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFail() {
+
+    }
 }

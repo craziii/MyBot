@@ -17,4 +17,14 @@ public class Penis implements GenericCommand {
 
         originChannel.sendMessage(":eggplant: Your Penis length is " + penisLength + " inches long :3").queue();
     }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFail() {
+
+    }
 }

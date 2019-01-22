@@ -59,6 +59,16 @@ public class Kick implements GenericCommand {
         }
     }
 
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFail() {
+
+    }
+
     private static void handleKickError(final TextChannel channel,
                                         final Member mentionedMember,
                                         final Throwable error) {

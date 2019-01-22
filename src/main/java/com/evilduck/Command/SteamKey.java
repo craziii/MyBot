@@ -54,6 +54,16 @@ public class SteamKey implements GenericCommand {
 
     }
 
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFail() {
+
+    }
+
     private static class SteamKeyCountDown extends TimerTask {
 
         private final MessageChannel messageChannel;

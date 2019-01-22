@@ -15,6 +15,6 @@ public class Penis implements GenericCommand {
         final TextChannel originChannel = message.getPayload().getTextChannel();
         final int penisLength = message.getPayload().getAuthor().getName().matches("DuckChan|Unstable Sloth") ? 100 : 1;
 
-        originChannel.sendMessage(":eggplant: Your Penis length is " + penisLength + " inches long :3").queue();
+        originChannel.sendMessage(":eggplant: Your Penis length is 1 inch long. Ya lil' bitch").queue();
     }
 }

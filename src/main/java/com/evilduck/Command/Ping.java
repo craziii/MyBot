@@ -32,7 +32,7 @@ public class Ping implements GenericCommand {
                 .addField("Value (ms)", valueOf(pingValue), true)
                 .addField("", pingIndicator.getPingText(), false)
                 .build())
-                .queue();
+                .queue(this::onSuccess, this::onFail);
     }
 
     private static PingIndicator getIndicatorForPing(final long pingValue) {
@@ -60,13 +60,18 @@ public class Ping implements GenericCommand {
     }
 
     @Override
-    public void onSuccess() {
-        LOGGER.info("ping display success in guild: {} | in text channel: {}", message.getPayload().getGuild(), message.getPayload().getTextChannel());
+    public void onSuccess(final net.dv8tion.jda.core.entities.Message message) {
+        LOGGER.info("ping display success in guild: {} | in text channel: {}",
+                message.getGuild(),
+                message.getTextChannel());
     }
 
     @Override
-    public void onFail() {
-        LOGGER.info("ping display failure in guild: {} | in text channel: {}", message.getPayload().getGuild(), message.getPayload().getTextChannel());
+    public void onFail(final Throwable throwable) {
+        //TODO: WAT DO TO ERROR
+//        LOGGER.info("ping display failure in guild: {} | in text channel: {}",
+//                message.getGuild(),
+//                message.getTextChannel());
     }
 
     private static class PingIndicator {

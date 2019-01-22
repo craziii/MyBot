@@ -18,6 +18,11 @@ public class Ping implements GenericCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
 
+    @Component
+public class Ping implements GenericCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ping.class);
+
     @Override
     @ServiceActivator(inputChannel = "pingChannel")
     public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) {
@@ -25,39 +30,48 @@ public class Ping implements GenericCommand {
         final TextChannel originTextChannel = message.getPayload().getTextChannel();
         final long pingValue = message.getPayload().getJDA().getPing();
 
-        if (pingValue < 100) {
-            originTextChannel.sendMessage(new EmbedBuilder()
-                    .setAuthor("Ping", "https://discordapp.com/assets/c6b26ba81f44b0c43697852e1e1d1420.svg")
-                    .setColor(new Color(0, 255, 0))
-                    .addField("Value (ms)", valueOf(pingValue), true)
-                    .addField("", "This is definitely a good thing", false)
-                    .build())
-                    .queue();
-        } else if (pingValue > 100 && pingValue <= 250) {
-            originTextChannel.sendMessage(new EmbedBuilder()
-                    .setAuthor("Ping", "https://i.imgur.com/OsfBMXz.png")
-                    .setColor(new Color(255, 255, 0))
-                    .addField("Value (ms)", valueOf(pingValue), true)
-                    .addField("", "This is possibly a small hiccup, but if it persists I'm getting my umbrella", false)
-                    .build())
-                    .queue();
-        } else if (pingValue > 250 && pingValue <= 500) {
-            originTextChannel.sendMessage(new EmbedBuilder()
-                    .setAuthor("Ping", "https://i.imgur.com/22oFoi2.png")
-                    .setColor(new Color(255, 165, 0))
-                    .addField("Value (ms)", valueOf(pingValue), true)
-                    .addField("", "This is possibly a small hiccup, but if it persists its getting to be a pretty bad thing", false)
-                    .build())
-                    .queue();
-        } else {
-            originTextChannel.sendMessage(new EmbedBuilder()
-                    .setAuthor("Ping", "https://discordapp.com/assets/15ccaf984f2fafcf3ed5d896763ed510.svg")
-                    .setColor(new Color(255, 0, 0))
-                    .addField("Value (ms)", valueOf(pingValue), true)
-                    .addField("", "This is a bad sign, I gotta be honest", false)
-                    .build())
-                    .queue();
+        String pingText = "";
+        byte pingColorR = 0;
+        byte pingColorG = 0;
+        byte pingColorB = 0;
+        String pingIcon = "";
+
+        if(pingValue < 100){
+            pingText = "This is definitely a good thing";
+            pingColorR = 34;
+            pingColorG = 139;
+            pingColorB = 34;
+            pingIcon = "https://discordapp.com/assets/c6b26ba81f44b0c43697852e1e1d1420.svg";
         }
+        else if(pingValue < 250){
+            pingText = "This is possibly a small hiccup, but if it persists I'm getting my umbrella";
+            pingColorR = 255;
+            pingColorG = 252;
+            pingColorB = 127;
+            pingIcon = "https://i.imgur.com/OsfBMXz.png";
+        }
+        else if(pingValue < 500){
+            pingText = "This is possibly a small hiccup, but if it persists its getting to be a pretty bad thing";
+            pingColorR = 255;
+            pingColorG = 126;
+            pingColorB = 71;
+            pingIcon = "https://i.imgur.com/22oFoi2.png";
+        }
+        else{
+            pingText = "This is a bad sign, I gotta be honest";
+            pingColorR = 255;
+            pingColorG = 0;
+            pingColorB = 0;
+            pingIcon = "https://discordapp.com/assets/15ccaf984f2fafcf3ed5d896763ed510.svg";
+        }
+
+            originTextChannel.sendMessage(new EmbedBuilder()
+                    .setAuthor("Ping", pingIcon)
+                    .setColor(pingColorR, pingColorG, pingColorB)
+                    .addField("Value (ms)", valueOf(pingValue), true)
+                    .addField("", pingText, false)
+                    .build())
+                    .queue();
     }
 
     @Override

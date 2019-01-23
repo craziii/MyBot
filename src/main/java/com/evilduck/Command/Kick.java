@@ -23,12 +23,7 @@ public class Kick implements GenericCommand {
         final Guild guild = message.getPayload().getGuild();
         final Member selfMember = guild.getSelfMember();
 
-        if (!selfMember.hasPermission(KICK_MEMBERS))
-            channel.sendMessage("I do not have permission to kick members").queue();
-        else if (mentionedUsers.size() == 0)
-            channel.sendMessage("Please mention the user you want to kick").queue();
-        else if (mentionedUsers.size() > 1)
-            channel.sendMessage("Please only specify one user to kick at a time").queue();
+        verifyCommandToRun(channel, mentionedUsers, selfMember);
 
 
         for (final User mentionedUser : mentionedUsers) {
@@ -42,8 +37,7 @@ public class Kick implements GenericCommand {
                 continue;
             }
 
-            guild.getController()
-                    .kick(mentionedMember).queue(success -> {
+            guild.getController().kick(mentionedMember).queue(success -> {
                         mentionedUser.openPrivateChannel().queue(privateChannel ->
                                 privateChannel
                                         .sendMessage("Hahaha, you've been kicked by ***ME!!!***")
@@ -58,13 +52,24 @@ public class Kick implements GenericCommand {
         }
     }
 
+    private void verifyCommandToRun(final TextChannel channel,
+                                    final List<User> mentionedUsers,
+                                    final Member selfMember) {
+        if (!selfMember.hasPermission(KICK_MEMBERS))
+            channel.sendMessage("I do not have permission to kick members").queue();
+        else if (mentionedUsers.size() == 0)
+            channel.sendMessage("Please mention the user you want to kick").queue();
+        else if (mentionedUsers.size() > 1)
+            channel.sendMessage("Please only specify one user to kick at a time").queue();
+    }
+
     @Override
-    public void onSuccess() {
+    public void onSuccess(final Message message) {
 
     }
 
     @Override
-    public void onFail() {
+    public void onFail(final Throwable throwable) {
 
     }
 

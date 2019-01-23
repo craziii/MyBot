@@ -1,14 +1,19 @@
 package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
+import com.evilduck.Entity.Member;
+import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.awt.Color;
+import java.io.IOException;
 
 import static java.lang.String.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -18,45 +23,31 @@ public class Ping implements GenericCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);
 
+    @Autowired
+    private BigDickRepository bigDickRepository;
+
     @Override
     @ServiceActivator(inputChannel = "pingChannel")
-    public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) {
+    public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) throws IOException {
         LOGGER.info("Received: {}", message.getPayload().getContentRaw());
         final TextChannel originTextChannel = message.getPayload().getTextChannel();
         final long pingValue = message.getPayload().getJDA().getPing();
         final PingIndicator pingIndicator = getIndicatorForPing(pingValue);
 
-        originTextChannel.sendMessage(new EmbedBuilder()
-                .setAuthor("Ping", pingIndicator.getPingIcon())
+        final net.dv8tion.jda.core.entities.Member member1 = message.getPayload().getMember();
+        final Member member = new Member(member1.getUser().getId(), member1.getEffectiveName());
+        bigDickRepository.save(member);
+
+        final MessageBuilder messageBuilder = new MessageBuilder();
+        final EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setAuthor("Ping")
+                .setThumbnail(pingIndicator.getPingIcon())
                 .setColor(pingIndicator.getPingColor())
                 .addField("Value (ms)", valueOf(pingValue), true)
-                .addField("", pingIndicator.getPingText(), false)
-                .build())
-                .queue(this::onSuccess, this::onFail);
-    }
+                .setDescription(pingIndicator.getPingText());
 
-    private static PingIndicator getIndicatorForPing(final long pingValue) {
-        if (pingValue < 100L) {
-            return new PingIndicator(
-                    "This is definitely a good thing",
-                    new Color(34, 139, 34),
-                    "https://discordapp.com/assets/c6b26ba81f44b0c43697852e1e1d1420.svg");
-        } else if (pingValue < 250L) {
-            return new PingIndicator(
-                    "This is possibly a small hiccup, but if it persists I'm getting my umbrella",
-                    new Color(255, 252, 127),
-                    "https://i.imgur.com/OsfBMXz.png");
-        } else if (pingValue < 500L) {
-            return new PingIndicator(
-                    "This is possibly a small hiccup, but if it persists its getting to be a pretty bad thing",
-                    new Color(255, 126, 71),
-                    "https://i.imgur.com/22oFoi2.png");
-        } else {
-            return new PingIndicator(
-                    "This is a bad sign, I gotta be honest",
-                    new Color(255, 0, 0),
-                    "https://discordapp.com/assets/15ccaf984f2fafcf3ed5d896763ed510.svg");
-        }
+        messageBuilder.setEmbed(embedBuilder.build());
+        originTextChannel.sendMessage(messageBuilder.build()).queue();
     }
 
     @Override
@@ -68,16 +59,39 @@ public class Ping implements GenericCommand {
 
     @Override
     public void onFail(final Throwable throwable) {
-        //TODO: WAT DO TO ERROR
-//        LOGGER.info("ping display failure in guild: {} | in text channel: {}",
-//                message.getGuild(),
-//                message.getTextChannel());
+        LOGGER.error("Error executing Ping command!", throwable);
+    }
+
+    private static PingIndicator getIndicatorForPing(final long pingValue) {
+        if (pingValue < 200L) {
+            return new PingIndicator(
+                    "This is definitely a good thing",
+                    new Color(0, 233, 10),
+                    "https://i.imgur.com/7SzeRXQ.png");
+        } else if (pingValue < 300L) {
+            return new PingIndicator(
+                    "This is possibly a small hiccup, but if it persists I'm getting my umbrella",
+                    new Color(221, 255, 0),
+                    "https://i.imgur.com/OsfBMXz.png");
+        } else if (pingValue < 400L) {
+            return new PingIndicator(
+                    "This is possibly a small hiccup, but if it persists its getting to be a pretty bad thing",
+                    new Color(255, 120, 0),
+                    "https://i.imgur.com/22oFoi2.png");
+        } else {
+            return new PingIndicator(
+                    "This is a bad sign, I gotta be honest",
+                    new Color(255, 0, 0),
+                    "https://i.imgur.com/AmWlvB8.png");
+        }
     }
 
     private static class PingIndicator {
+
         private final String pingText;
         private final Color pingColor;
         private final String pingIcon;
+        private final String fileName;
 
         private PingIndicator(final String pingText,
                               final Color pingColor,
@@ -85,18 +99,25 @@ public class Ping implements GenericCommand {
             this.pingText = pingText;
             this.pingColor = pingColor;
             this.pingIcon = pingIcon;
+            final String[] urlParts = pingIcon.split("/");
+            this.fileName = urlParts[urlParts.length - 1];
         }
 
-        public String getPingText() {
+        String getPingText() {
             return pingText;
         }
 
-        public Color getPingColor() {
+        Color getPingColor() {
             return pingColor;
         }
 
-        public String getPingIcon() {
+        String getPingIcon() {
             return pingIcon;
         }
+
+        public String getFileName() {
+            return fileName;
+        }
     }
+
 }

@@ -26,17 +26,17 @@ public final class Starter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
     private final Environment environment;
-    private final CommandDetailRepository mongoRepository;
+    private final CommandDetailRepository commandDetailRepository;
     private final String commandPackage;
     private final MessageChannelConfiguration messageChannelConfiguration;
 
     @Autowired
     public Starter(final Environment environment,
-                   final CommandDetailRepository mongoRepository,
+                   final CommandDetailRepository commandDetailRepository,
                    @Value("${command.package}") final String commandPackage,
                    final MessageChannelConfiguration messageChannelConfiguration) {
         this.environment = environment;
-        this.mongoRepository = mongoRepository;
+        this.commandDetailRepository = commandDetailRepository;
         this.commandPackage = commandPackage;
         this.messageChannelConfiguration = messageChannelConfiguration;
     }
@@ -71,8 +71,8 @@ public final class Starter {
                     commandDetailList.add(new CommandDetail(file.getName().replace(".class", "")));
             }
             commandDetailList.forEach(CommandDetail::generateCamelCaseAlias);
-            mongoRepository.deleteAll();
-            mongoRepository.saveAll(commandDetailList);
+            commandDetailRepository.deleteAll();
+            commandDetailRepository.saveAll(commandDetailList);
         }
 
     }

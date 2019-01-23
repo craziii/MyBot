@@ -55,12 +55,12 @@ public class SteamKey implements GenericCommand {
     }
 
     @Override
-    public void onSuccess() {
+    public void onSuccess(Message message) {
 
     }
 
     @Override
-    public void onFail() {
+    public void onFail(Throwable throwable) {
 
     }
 

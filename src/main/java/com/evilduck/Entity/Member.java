@@ -4,13 +4,13 @@ import org.springframework.data.annotation.Id;
 
 public class Member {
 
-    @Id public String id;
-    public String name;
+    @Id
+    public final String id;
+    public final String name;
 
-    public Member() {
-    }
-
-    public Member(final String name) {
+    public Member(final String id,
+                  final String name) {
+        this.id = id;
         this.name = name;
     }
 

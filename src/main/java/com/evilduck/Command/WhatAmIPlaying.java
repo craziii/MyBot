@@ -3,6 +3,7 @@ package com.evilduck.Command;
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.util.List;
@@ -30,11 +31,16 @@ public class WhatAmIPlaying implements GenericCommand {
         if (!whatImPlaying.isPresent())
             message.getPayload()
                     .getTextChannel()
-                    .sendMessage("You must specify a what Im playing!")
+                    .sendMessage("You must specify a what i'm playing!")
                     .queue();
 
         message.getPayload().getJDA().getPresence().setGame(Game.of(LISTENING, whatImPlaying.orElse("Listening...")));
 
+    }
+
+    @Override
+    public boolean hasPermissionToRun(Member requestingMember) {
+        return false;
     }
 
     @Override

@@ -1,10 +1,11 @@
 package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
-import com.evilduck.Entity.Member;
+import com.evilduck.Entity.BitDickEntity;
 import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.awt.Color;
-import java.io.IOException;
 
 import static java.lang.String.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -28,15 +28,14 @@ public class Ping implements GenericCommand {
 
     @Override
     @ServiceActivator(inputChannel = "pingChannel")
-    public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) throws IOException {
+    public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) {
         LOGGER.info("Received: {}", message.getPayload().getContentRaw());
         final TextChannel originTextChannel = message.getPayload().getTextChannel();
         final long pingValue = message.getPayload().getJDA().getPing();
         final PingIndicator pingIndicator = getIndicatorForPing(pingValue);
 
-        final net.dv8tion.jda.core.entities.Member member1 = message.getPayload().getMember();
-        final Member member = new Member(member1.getUser().getId(), member1.getEffectiveName());
-        bigDickRepository.save(member);
+        final Member member = message.getPayload().getMember();
+        bigDickRepository.save(new BitDickEntity(member.getUser().getId()));
 
         final MessageBuilder messageBuilder = new MessageBuilder();
         final EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -48,6 +47,11 @@ public class Ping implements GenericCommand {
 
         messageBuilder.setEmbed(embedBuilder.build());
         originTextChannel.sendMessage(messageBuilder.build()).queue();
+    }
+
+    @Override
+    public boolean hasPermissionToRun(Member requestingMember) {
+        return false;
     }
 
     @Override

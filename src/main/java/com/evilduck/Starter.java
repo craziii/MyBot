@@ -10,7 +10,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -43,7 +42,6 @@ public final class Starter {
 
     @PostConstruct
     public void init() throws IOException {
-
         messageChannelConfiguration.instantiateMessageChannels();
 
         final StringBuilder outputListString = new StringBuilder();

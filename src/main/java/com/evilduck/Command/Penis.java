@@ -1,21 +1,42 @@
 package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
+import com.evilduck.Repository.BigDickRepository;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 @Component
 public class Penis implements GenericCommand {
 
+    private final BigDickRepository bigDickRepository;
+
+    @Autowired
+    public Penis(final BigDickRepository bigDickRepository) {
+        this.bigDickRepository = bigDickRepository;
+    }
+
     @Override
     @ServiceActivator(inputChannel = "penisChannel")
     public void execute(org.springframework.messaging.Message<Message> message) {
-        final TextChannel originChannel = message.getPayload().getTextChannel();
-        final int penisLength = message.getPayload().getAuthor().getName().matches("DuckChan|Unstable Sloth") ? 100 : 1;
+        final int penisLength = bigDickRepository.findById(message.getPayload()
+                .getAuthor().getId()).isPresent() ? 100 : 1;
 
-        originChannel.sendMessage(":eggplant: Your Penis length is " + penisLength + " inches long :3").queue();
+        message.getPayload()
+                .getTextChannel()
+                .sendMessage(":eggplant: " +
+                        message.getPayload().getAuthor().getAsMention() +
+                        "'s penis length is " +
+                        penisLength +
+                        " inches long :3")
+                .queue();
+    }
+
+    @Override
+    public boolean hasPermissionToRun(Member requestingMember) {
+        return false;
     }
 
     @Override

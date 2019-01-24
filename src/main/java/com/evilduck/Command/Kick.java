@@ -2,7 +2,11 @@ package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.PermissionException;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
@@ -16,7 +20,10 @@ public class Kick implements GenericCommand {
 
     @Override
     @ServiceActivator(inputChannel = "kickChannel")
-    public void execute(org.springframework.messaging.Message<Message> message) {
+    public void execute(final org.springframework.messaging.Message<Message> message) {
+
+        if (!hasPermissionToRun(message.getPayload().getMember()))
+            throw new PermissionException(KICK_MEMBERS.getName());
 
         final TextChannel channel = message.getPayload().getTextChannel();
         final List<User> mentionedUsers = message.getPayload().getMentionedUsers();
@@ -51,6 +58,12 @@ public class Kick implements GenericCommand {
             );
         }
     }
+
+    @Override
+    public boolean hasPermissionToRun(final Member requestingMember) {
+        return requestingMember.hasPermission(KICK_MEMBERS);
+    }
+
 
     private void verifyCommandToRun(final TextChannel channel,
                                     final List<User> mentionedUsers,

@@ -2,6 +2,7 @@ package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
 import com.evilduck.Util.CommandHelper;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -52,6 +53,11 @@ public class SteamKey implements GenericCommand {
             timer.schedule(new SteamKeyDelete(originChannel, messageId),
                     now().plusSeconds(expiry + 5).toDate());
 
+    }
+
+    @Override
+    public boolean hasPermissionToRun(Member requestingMember) {
+        return false;
     }
 
     @Override

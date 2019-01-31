@@ -1,7 +1,6 @@
 package com.evilduck.Util;
 
 import net.dv8tion.jda.core.JDA;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,12 @@ public class HealthReport {
 
     @Scheduled(fixedRate = 300000)
     public void healthReport() {
-        final StringBuilder healthOutput = new StringBuilder();
-        healthOutput.append("\nHealth Report:\t").append(new PrettyDate(DateTime.now()));
-        healthOutput.append("\nPing:\t\t\t").append(jda.getPing() + "ms");
+        final StringBuilder healthOutput = new StringBuilder()
+                .append("Health Report:\n")
+                .append(PrettyDate.now())
+                .append("\nPing:\t\t\t")
+                .append(jda.getPing())
+                .append("ms");
 
         LOGGER.info(healthOutput.toString());
     }

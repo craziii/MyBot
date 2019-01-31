@@ -12,6 +12,10 @@ public class PrettyDate {
         this.dateTime = dateTime;
     }
 
+    static PrettyDate now() {
+        return new PrettyDate(DateTime.now());
+    }
+
     @Override
     public String toString() {
         return format("%d/%d/%d - %d:%d:%d.%d",

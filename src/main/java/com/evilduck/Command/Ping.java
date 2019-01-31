@@ -1,14 +1,11 @@
 package com.evilduck.Command;
 
 import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
-import com.evilduck.Entity.BitDickEntity;
-import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -23,9 +20,6 @@ public class Ping implements GenericCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);
 
-    @Autowired
-    private BigDickRepository bigDickRepository;
-
     @Override
     @ServiceActivator(inputChannel = "pingChannel")
     public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) {
@@ -33,9 +27,6 @@ public class Ping implements GenericCommand {
         final TextChannel originTextChannel = message.getPayload().getTextChannel();
         final long pingValue = message.getPayload().getJDA().getPing();
         final PingIndicator pingIndicator = getIndicatorForPing(pingValue);
-
-        final Member member = message.getPayload().getMember();
-        bigDickRepository.save(new BitDickEntity(member.getUser().getId()));
 
         final MessageBuilder messageBuilder = new MessageBuilder();
         final EmbedBuilder embedBuilder = new EmbedBuilder()

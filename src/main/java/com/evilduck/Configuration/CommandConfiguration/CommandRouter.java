@@ -10,9 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Router;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 @MessageEndpoint
 public class CommandRouter {
@@ -35,27 +39,62 @@ public class CommandRouter {
     }
 
     @Bean
-    public IntegrationFlow commandFlow() {
-        return IntegrationFlows.from(commandInputChannel)
+    public IntegrationFlow generalCommandFlow() {
+        return IntegrationFlows.from(commandInputChannel)   //TODO: MAYBE USE RAW FLOWS WITHOUT CHANNELS???
                 .transform(commandFormatter)
-                .filter((Message p) -> !p.getAuthor().getDiscriminator()
-                        .equals(jda.getSelfUser().getDiscriminator()))
-                .filter((Message p) -> commandDetailRepository
-                        .findOneByFullCommand(getCommandString(p.getContentRaw())) != null)
-                .channel("resolveCommandChannel")
+                .filter((Message p) -> isNotThisBot(p, jda))
+                .<Message, Boolean>route(
+                        message -> commandDetailRepository.findOneByFullCommand(message.getContentRaw()) != null,
+                        m -> m.subFlowMapping(TRUE, callableCommandFlow())
+                                .subFlowMapping(FALSE, autoFireCommandFlow()))
                 .get();
     }
 
-    @Router(inputChannel = "resolveCommandChannel")
+    @Bean
+    public IntegrationFlow callableCommandFlow() {
+        return flow -> flow.channel("resolveCallableCommandChannel");
+    }
+
+    @Bean
+    public IntegrationFlow autoFireCommandFlow() {
+        return flow -> flow.channel("resolveAutoFireCommandChannel");
+    }
+
+
+    @Router(inputChannel = "resolveCallableCommandChannel")
     public String commandChannelRouter(final Object payload) {
-        if (payload instanceof Message) {
+        if (payload instanceof Message)
             return getCommandString(((Message) payload).getContentRaw()) + "Channel";
-        } else
+        else
             throw new TypeMismatchException(payload, Message.class);
+    }
+
+    @Router(inputChannel = "resolveAutoFireCommandChannel")
+    public String autoFireCommandChannelRouter(final Object payload) {
+        if (payload instanceof Message)
+            return getCommandString(((Message) payload).getContentRaw()) + "Channel";
+        else
+            throw new TypeMismatchException(payload, Message.class);
+    }
+
+    @Bean
+    public MessageChannel callableCommandChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    public MessageChannel autoFireCommandChannel() {
+        return new DirectChannel();
     }
 
     private String getCommandString(final String rawCommand) {
         return rawCommand.replace("!", "").split(" ")[0];
     }
 
+
+    private static boolean isNotThisBot(final Message payload,
+                                        final JDA jda) {
+        return !payload.getAuthor().getDiscriminator()
+                .equals(jda.getSelfUser().getDiscriminator());
+    }
 }

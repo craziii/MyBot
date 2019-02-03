@@ -1,4 +1,4 @@
-package com.evilduck.Configuration.CommandConfiguration;
+package com.evilduck.Configuration.MessageHandling;
 
 import net.dv8tion.jda.core.entities.Message;
 

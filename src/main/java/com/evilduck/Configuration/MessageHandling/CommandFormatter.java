@@ -1,4 +1,4 @@
-package com.evilduck.Configuration.CommandConfiguration;
+package com.evilduck.Configuration.MessageHandling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

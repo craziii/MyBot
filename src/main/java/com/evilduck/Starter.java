@@ -65,8 +65,14 @@ public final class Starter {
             if (shouldBeDirectory.isDirectory()) {
                 final File[] files = shouldBeDirectory.listFiles();
                 assert files != null;
-                for (final File file : files)
-                    commandDetailList.add(new CommandDetail(file.getName().replace(".class", "")));
+                for (final File file : files) {
+                    final String fileName = file.getName();
+                    if (fileName.contains("$") || !fileName.contains(".class")) continue;
+
+                    final String fullCommand = fileName.replace(".class", "");
+                    final CommandDetail nextCommandDetail = new CommandDetail(fullCommand);
+                    commandDetailList.add(nextCommandDetail);
+                }
             }
             commandDetailList.forEach(CommandDetail::generateCamelCaseAlias);
             commandDetailRepository.deleteAll();

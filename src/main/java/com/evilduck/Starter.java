@@ -1,9 +1,11 @@
 package com.evilduck;
 
+import com.evilduck.Command.Tools.IsACommand;
 import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +15,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
 
 @Component
 public final class Starter {
@@ -30,17 +31,17 @@ public final class Starter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
-    private final String commandPackage;
+    private final String commandPackagePath;
     private final MessageChannelConfiguration messageChannelConfiguration;
 
     @Autowired
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
-                   @Value("${command.package}") final String commandPackage,
+                   @Value("${command.package}") final String commandPackagePath,
                    final MessageChannelConfiguration messageChannelConfiguration) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
-        this.commandPackage = commandPackage;
+        this.commandPackagePath = commandPackagePath;
         this.messageChannelConfiguration = messageChannelConfiguration;
     }
 
@@ -57,37 +58,28 @@ public final class Starter {
             outputListString.append(format("%s\n", defaultProfile));
         LOGGER.info("Environments:\n{}", outputListString.toString());
 
-        setupCommandsRepo();
+        getCommandClasses();
     }
 
-    private void setupCommandsRepo() throws IOException {
-        final Enumeration resources = currentThread()
-                .getContextClassLoader()
-                .getResources(commandPackage.replace(".", "/"));
-
+    private void getCommandClasses() {
+        final Reflections reflections = new Reflections(commandPackagePath);
+        final Set<Class<?>> commandClasses = reflections.getTypesAnnotatedWith(IsACommand.class);
         final List<CommandDetail> commandDetailList = new ArrayList<>();
+        commandClasses.forEach(commandClass -> {
+            final Optional<IsACommand> isACommand = ofNullable(commandClass.getAnnotation(IsACommand.class));
+            if (isACommand.isPresent()) {
+                final String commandName = commandClass.getSimpleName();
+                final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
+                commandDetail.setDescription(isACommand.get().description());
 
-        while(resources.hasMoreElements()) {
-            final File shouldBeDirectory = new File(((URL) resources.nextElement()).getFile());
-
-            if (shouldBeDirectory.isDirectory()) {
-                final File[] files = shouldBeDirectory.listFiles();
-                assert files != null;
-                for (final File file : files) {
-                    final String fileName = file.getName();
-                    if (fileName.contains("$") || !fileName.contains(".class")) continue;
-
-                    final String fullCommand = fileName.replace(".class", "");
-                    final CommandDetail nextCommandDetail = new CommandDetail(fullCommand);
-                    commandDetailList.add(nextCommandDetail);
-                }
+                commandDetailList.add(commandDetail);
             }
-            commandDetailList.forEach(CommandDetail::generateCamelCaseAlias);
-            commandDetailRepository.deleteAll();
-            commandDetailRepository.saveAll(commandDetailList);
-        }
+        });
 
+        commandDetailRepository.deleteAll();
+        commandDetailRepository.saveAll(commandDetailList);
     }
+
 
     private static String loadStartupText() {
         final Try<String> introAsciiArt = TryFactory.attempt(() -> new Scanner(ResourceUtils.getFile("classpath:jeff_intro.txt")).useDelimiter("\\Z").next()).orElse(null);

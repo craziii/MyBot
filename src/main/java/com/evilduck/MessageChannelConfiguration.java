@@ -1,18 +1,12 @@
 package com.evilduck;
 
-import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Util.CommandHelper;
-import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.messaging.MessageChannel;
-
-import java.util.List;
 
 @Configuration
 @EnableIntegration
@@ -49,7 +43,7 @@ public class MessageChannelConfiguration {
 ////        final MutablePropertyValues mutablePropertyValues = new MutablePropertyValues();
 ////        genericBeanDefinition.setPropertyValues(mutablePropertyValues);
 //
-//        final List<CommandDetail> commandDetailList = commandHelper.getCommandDetailList();
+//        final List<IsACommand> commandDetailList = commandHelper.getCommandDetailList();
 //        commandDetailList.forEach(commandDetail -> context.registerBeanDefinition(commandDetail.getFullCommand(), genericBeanDefinition));
 
     }

@@ -1,5 +1,6 @@
 package com.evilduck.Command;
 
+import com.evilduck.Command.Tools.IsACommand;
 import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.entities.Member;
@@ -16,6 +17,7 @@ import static java.lang.Integer.parseInt;
 import static org.joda.time.DateTime.now;
 
 @Component
+@IsACommand
 public class SteamKey implements GenericCommand {
 
     private final CommandHelper commandHelper;

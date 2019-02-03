@@ -1,5 +1,6 @@
 package com.evilduck.Command;
 
+import com.evilduck.Command.Tools.IsACommand;
 import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -16,6 +17,7 @@ import java.util.List;
 import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 
 @Component
+@IsACommand
 public class Kick implements GenericCommand {
 
     @Override

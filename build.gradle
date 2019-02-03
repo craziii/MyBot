@@ -30,6 +30,7 @@ dependencies {
 	compile group: 'joda-time', name: 'joda-time', version: '2.3'
 	compile 'net.dv8tion:JDA:3.5.0_329'
 	compile 'com.jecklgamis:try-monad:1.0'
+	compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
 	compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
 

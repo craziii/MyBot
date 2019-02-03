@@ -1,5 +1,6 @@
 package com.evilduck.Command;
 
+import com.evilduck.Command.Tools.IsACommand;
 import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -16,6 +17,7 @@ import static java.lang.String.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
+@IsACommand
 public class Ping implements GenericCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);

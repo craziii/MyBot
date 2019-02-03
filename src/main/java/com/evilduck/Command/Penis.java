@@ -1,5 +1,6 @@
 package com.evilduck.Command;
 
+import com.evilduck.Command.Tools.IsACommand;
 import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.entities.Member;
@@ -9,6 +10,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 @Component
+@IsACommand
 public class Penis implements GenericCommand {
 
     private final BigDickRepository bigDickRepository;

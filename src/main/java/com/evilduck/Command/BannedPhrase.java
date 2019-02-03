@@ -1,4 +1,4 @@
-package com.evilduck.Command.AutoFire;
+package com.evilduck.Command;
 
 import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import net.dv8tion.jda.core.entities.Member;

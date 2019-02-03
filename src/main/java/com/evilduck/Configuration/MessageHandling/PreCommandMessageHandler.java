@@ -17,19 +17,19 @@ public class PreCommandMessageHandler {
 
     private final MessageChannel commandInputChannel;
     private final CommandFormatter commandFormatter;
-    private final CommandFilter commandFilter;
+    private final MessageFilter messageFilter;
     private final MessageRouter messageRouter;
     private final CommandDetailRepository commandDetailRepository;
 
     @Autowired
     public PreCommandMessageHandler(final CommandFormatter commandFormatter,
                                     final MessageChannel commandInputChannel,
-                                    final CommandFilter commandFilter,
+                                    final MessageFilter messageFilter,
                                     final MessageRouter messageRouter,
                                     final CommandDetailRepository commandDetailRepository) {
         this.commandFormatter = commandFormatter;
         this.commandInputChannel = commandInputChannel;
-        this.commandFilter = commandFilter;
+        this.messageFilter = messageFilter;
         this.messageRouter = messageRouter;
         this.commandDetailRepository = commandDetailRepository;
     }
@@ -38,7 +38,7 @@ public class PreCommandMessageHandler {
     public IntegrationFlow generalCommandFlow() {
         return IntegrationFlows.from(commandInputChannel)
                 .transform(commandFormatter)
-                .filter(commandFilter)
+                .filter(messageFilter)
                 .route(messageRouter)
                 .get();
     }

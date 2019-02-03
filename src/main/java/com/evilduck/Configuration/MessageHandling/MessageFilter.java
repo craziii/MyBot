@@ -6,7 +6,7 @@ import org.springframework.integration.annotation.Filter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CommandFilter {
+public class MessageFilter {
 
     @Filter
     public boolean commandFilter(final org.springframework.messaging.Message<Message> message) {

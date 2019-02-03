@@ -14,6 +14,7 @@ public class CommandDetail {
     public String id;
 
     private String fullCommand;
+    private String camelCaseAlias;
     private List<String> aliases;
 
     public CommandDetail(final String fullCommand) {
@@ -25,26 +26,42 @@ public class CommandDetail {
         return fullCommand;
     }
 
-    public void setFullCommand(String fullCommand) {
+    public void setFullCommand(final String fullCommand) {
         this.fullCommand = fullCommand;
     }
 
+    public String getCamelCaseAlias() {
+        return camelCaseAlias;
+    }
+
+    public void setCamelCaseAlias(String camelCaseAlias) {
+        this.camelCaseAlias = camelCaseAlias;
+    }
+
     public List<String> getAliases() {
-        generateCamelCaseAlias();
         return aliases;
     }
 
-    public void setAliases(List<String> aliases) {
+    public void setAliases(final List<String> aliases) {
         this.aliases = aliases;
     }
 
     public void generateCamelCaseAlias() {
-        final String snakeCaseCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fullCommand);
+        aliases.add(generateCamelCaseAlias(fullCommand));
+    }
+
+    private String generateCamelCaseAlias(final String rawCommand) {
+        final String snakeCaseCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, rawCommand);
         final List<Character> firstLetters = new ArrayList<>();
         asList(snakeCaseCommand.split("_")).forEach(word -> firstLetters.add(word.charAt(0)));
+
         final StringBuilder firstLettersAliasBuilder = new StringBuilder();
         firstLetters.forEach(firstLettersAliasBuilder::append);
-        aliases.add(firstLettersAliasBuilder.toString());
+        return firstLettersAliasBuilder.toString();
+    }
+
+    public boolean commandStringMatches(final String commandString) {
+        return commandString.matches(fullCommand) || aliases.stream().anyMatch(alias -> alias.matches(commandString));
     }
 
     @Override

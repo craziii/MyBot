@@ -1,6 +1,6 @@
 
  version:       0.19.24.0 (version.major.minor+opt+bug.release)
- major change:  19
- minor change:  13
- optimizations: 6
+ major change:  21
+ minor change:  14
+ optimizations: 7
  bug fixes:     5

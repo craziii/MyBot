@@ -1,6 +1,7 @@
 package com.evilduck.Configuration.MessageHandling;
 
 import com.evilduck.Entity.CommandDetail;
+import com.evilduck.Exception.MatchedTooManyCommandsException;
 import com.evilduck.Repository.CommandDetailRepository;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -39,7 +40,10 @@ public class MessageRouter {
             embedBuilder.appendDescription("You can add more letters to your message to or type the whole command name to be more specific");
 
             message.getPayload().getTextChannel().sendMessage(embedBuilder.build()).queue();
-            return null;
+            // TODO: NEED CONTROLLER ADVICE OR ERROR CHANNEL IMPLEMENTATION TO DEAL WITH THESE, CONSOLE OUTPUT MAKES ME SICK
+            throw new MatchedTooManyCommandsException("Message matched more than one command, message: \'" +
+                    message +
+                    "\', matched commands: " + matchedCommands.toString());
         } else
             return "autoFireCommandChannel";
 

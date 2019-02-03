@@ -1,6 +1,6 @@
 package com.evilduck.Command;
 
-import com.evilduck.Configuration.CommandConfiguration.GenericCommand;
+import com.evilduck.Configuration.MessageHandling.GenericCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;

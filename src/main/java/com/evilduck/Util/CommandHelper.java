@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class CommandHelper {
@@ -30,5 +31,15 @@ public class CommandHelper {
     public List<String> getArgs(final String rawContent) {
         return asList(rawContent.split(" "));
     }
+
+    public List<CommandDetail> matchCommandString(final String commandString) {
+
+        final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();
+
+        return commandDetailList.stream().filter(commandDetail ->
+                commandDetail.commandStringMatches(commandString)).collect(toList());
+
+    }
+
 
 }

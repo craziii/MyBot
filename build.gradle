@@ -29,6 +29,7 @@ dependencies {
 	compile group: 'org.springframework.integration', name: 'spring-integration-core', version: '5.1.1.RELEASE'
 	compile group: 'joda-time', name: 'joda-time', version: '2.3'
 	compile 'net.dv8tion:JDA:3.5.0_329'
+	compile 'com.jecklgamis:try-monad:1.0'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
 	compile group: 'com.google.guava', name: 'guava', version: '23.5-jre'
 

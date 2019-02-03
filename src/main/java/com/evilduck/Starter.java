@@ -2,12 +2,15 @@ package com.evilduck;
 
 import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
+import com.jecklgamis.util.Try;
+import com.jecklgamis.util.TryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -16,6 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -42,6 +46,10 @@ public final class Starter {
 
     @PostConstruct
     public void init() throws IOException {
+
+        LOGGER.info("JeffBot is starting...");
+        System.out.println(loadStartupText());
+
         messageChannelConfiguration.instantiateMessageChannels();
 
         final StringBuilder outputListString = new StringBuilder();
@@ -80,5 +88,11 @@ public final class Starter {
         }
 
     }
+
+    private static String loadStartupText() {
+        final Try<String> introAsciiArt = TryFactory.attempt(() -> new Scanner(ResourceUtils.getFile("classpath:jeff_intro.txt")).useDelimiter("\\Z").next()).orElse(null);
+        return introAsciiArt.isSuccess() ? introAsciiArt.get() : "";
+    }
+
 
 }

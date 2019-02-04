@@ -32,6 +32,36 @@ public class CommandHelper {
         return asList(rawContent.split(" "));
     }
 
+    public String getArgsAsString(final String rawContent,
+                                  final int start,
+                                  final int end) {
+        final List<String> args = getArgs(rawContent);
+        return getArgsAsString(args, start, end);
+    }
+
+    public String getArgsAsString(final String rawContent,
+                                  final int start) {
+        final List<String> args = getArgs(rawContent);
+        final int end = args.size();
+        return getArgsAsString(args, start, end);
+    }
+
+    public String getArgsAsAString(final List<String> args,
+                                   final int start) {
+        return getArgsAsString(args, start, args.size());
+    }
+
+    public String getArgsAsString(final List<String> args,
+                                  final int start,
+                                  final int end) {
+        final StringBuilder argsStringBuilder = new StringBuilder();
+        for (int i = start; i < end; i++) {
+            argsStringBuilder.append(args.get(i))
+                    .append(" ");
+        }
+        return argsStringBuilder.toString();
+    }
+
     public List<CommandDetail> matchCommandString(final String commandString) {
 
         final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();

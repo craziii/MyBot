@@ -1,6 +1,5 @@
 package com.evilduck.Configuration.MessageHandling;
 
-import com.evilduck.Repository.CommandDetailRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +18,16 @@ public class PreCommandMessageHandler {
     private final CommandFormatter commandFormatter;
     private final MessageFilter messageFilter;
     private final MessageRouter messageRouter;
-    private final CommandDetailRepository commandDetailRepository;
 
     @Autowired
     public PreCommandMessageHandler(final CommandFormatter commandFormatter,
                                     final MessageChannel commandInputChannel,
                                     final MessageFilter messageFilter,
-                                    final MessageRouter messageRouter,
-                                    final CommandDetailRepository commandDetailRepository) {
+                                    final MessageRouter messageRouter) {
         this.commandFormatter = commandFormatter;
         this.commandInputChannel = commandInputChannel;
         this.messageFilter = messageFilter;
         this.messageRouter = messageRouter;
-        this.commandDetailRepository = commandDetailRepository;
     }
 
     @Bean
@@ -41,17 +37,6 @@ public class PreCommandMessageHandler {
                 .filter(messageFilter)
                 .route(messageRouter)
                 .get();
-    }
-
-    // TODO: THESE SEEM REDUNDANT, CAN WE CALL THE ROUTERS DIRECTLY WITHOUT CHANNELS/FLOWS ?
-    @Bean
-    public IntegrationFlow callableCommandFlow() {
-        return flow -> flow.channel("resolveCallableCommandChannel");
-    }
-
-    @Bean
-    public IntegrationFlow autoFireCommandFlow() {
-        return flow -> flow.channel("resolveAutoFireCommandChannel");
     }
 
 }

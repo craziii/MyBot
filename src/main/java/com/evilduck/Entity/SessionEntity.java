@@ -1,6 +1,6 @@
 package com.evilduck.Entity;
 
-import org.joda.time.DateTime;
+import net.dv8tion.jda.core.entities.Member;
 import org.springframework.data.annotation.Id;
 
 public class SessionEntity {
@@ -8,38 +8,46 @@ public class SessionEntity {
     @Id
     private String id;
 
-    private final MemberEntity member;
-    private final DateTime startTime;
-    private DateTime lastUpdateTime;
+    private Member member;
+    private String savedDetail;
 
-    public SessionEntity(final MemberEntity member,
-                         final DateTime startTime,
-                         final DateTime lastUpdateTime) {
-        this.id = member.getId();
+    public SessionEntity(final Member member,
+                         final String savedDetail) {
+        this.id = member.getUser().getId();
         this.member = member;
-        this.startTime = startTime;
-        this.lastUpdateTime = lastUpdateTime;
+        this.savedDetail = savedDetail;
     }
-
 
     public String getId() {
         return id;
     }
 
-    public MemberEntity getMember() {
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Member getMember() {
         return member;
     }
 
-    public DateTime getStartTime() {
-        return startTime;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
-    public DateTime getLastUpdateTime() {
-        return lastUpdateTime;
+    public Object getSavedDetail() {
+        return savedDetail;
     }
 
-    public void setLastUpdateTime(final DateTime lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
+    public void setSavedDetail(String savedDetail) {
+        this.savedDetail = savedDetail;
     }
 
+    @Override
+    public String toString() {
+        return "SessionEntity{" +
+                "id='" + id + '\'' +
+                ", member=" + member +
+                ", savedDetail=" + savedDetail +
+                '}';
+    }
 }

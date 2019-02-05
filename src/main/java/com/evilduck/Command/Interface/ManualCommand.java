@@ -1,4 +1,4 @@
-package com.evilduck.Configuration.MessageHandling;
+package com.evilduck.Command.Interface;
 
 
 import net.dv8tion.jda.core.entities.Member;

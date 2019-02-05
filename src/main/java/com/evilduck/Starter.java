@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -24,11 +23,13 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.springframework.util.ResourceUtils.getFile;
 
 @Component
 public final class Starter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Starter.class);
+
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
     private final String commandPackagePath;
@@ -62,9 +63,12 @@ public final class Starter {
     }
 
     private void getCommandClasses() {
-        final Reflections reflections = new Reflections(commandPackagePath);
-        final Set<Class<?>> commandClasses = reflections.getTypesAnnotatedWith(IsACommand.class);
+        System.out.println("\n ========== ========== ========== ========== ==========\n");
+        LOGGER.info("Loading Command Classes from path: \'{}\'", commandPackagePath);
+
+        final Set<Class<?>> commandClasses = new Reflections(commandPackagePath).getTypesAnnotatedWith(IsACommand.class);
         final List<CommandDetail> commandDetailList = new ArrayList<>();
+
         commandClasses.forEach(commandClass -> {
             final Optional<IsACommand> isACommand = ofNullable(commandClass.getAnnotation(IsACommand.class));
             if (isACommand.isPresent()) {
@@ -72,19 +76,27 @@ public final class Starter {
                 final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
                 commandDetail.setDescription(isACommand.get().description());
 
+                LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
+                        commandDetail.getFullCommand(),
+                        commandDetail.getAliases());
+
                 commandDetailList.add(commandDetail);
             }
         });
 
+        LOGGER.info("Saving all commands to CommandDetailRepository");
         commandDetailRepository.deleteAll();
         commandDetailRepository.saveAll(commandDetailList);
-    }
 
+        System.out.println("\n ========== ========== ========== ========== ==========\n");
+    }
 
     private static String loadStartupText() {
-        final Try<String> introAsciiArt = TryFactory.attempt(() -> new Scanner(ResourceUtils.getFile("classpath:jeff_intro.txt")).useDelimiter("\\Z").next()).orElse(null);
+        final Try<String> introAsciiArt = TryFactory.attempt(() ->
+                new Scanner(getFile("classpath:jeff_intro.txt"))
+                        .useDelimiter("\\Z").next())
+                .orElse(null);
         return introAsciiArt.isSuccess() ? introAsciiArt.get() : "";
     }
-
 
 }

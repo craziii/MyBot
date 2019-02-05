@@ -1,12 +1,12 @@
 package com.evilduck.Command;
 
-import com.evilduck.Configuration.MessageHandling.GenericCommand;
+import com.evilduck.Configuration.MessageHandling.ManualCommand;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BannedPhrase implements GenericCommand {
+public class BannedPhrase implements ManualCommand {
 
 //    private final BannedPhraseRepository bannedPhraseRepository;
 //

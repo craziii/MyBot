@@ -1,6 +1,6 @@
 package com.evilduck;
 
-import com.evilduck.Configuration.MessageHandling.CommandGateway;
+import com.evilduck.Configuration.MessageHandling.MessageGateway;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +11,16 @@ import static org.springframework.integration.support.MessageBuilder.withPayload
 @Component
 public class MessageListener extends ListenerAdapter {
 
-    private final CommandGateway commandGateway;
+    private final MessageGateway messageGateway;
 
     @Autowired
-    public MessageListener(CommandGateway commandGateway) {
-        this.commandGateway = commandGateway;
+    public MessageListener(MessageGateway messageGateway) {
+        this.messageGateway = messageGateway;
     }
 
     @Override
     public void onMessageReceived(final MessageReceivedEvent event) {
-        commandGateway.processCommand(withPayload(event.getMessage()).build());
+        messageGateway.processCommand(withPayload(event.getMessage()).build());
     }
 
 }

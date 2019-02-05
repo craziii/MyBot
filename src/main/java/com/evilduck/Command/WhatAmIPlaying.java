@@ -1,7 +1,7 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Tools.IsACommand;
-import com.evilduck.Configuration.MessageHandling.GenericCommand;
+import com.evilduck.Configuration.MessageHandling.ManualCommand;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -18,7 +18,7 @@ import static net.dv8tion.jda.core.entities.Game.GameType.*;
 //  TODO: WORK IN PROGRESS!
 @Component
 @IsACommand
-public class WhatAmIPlaying implements GenericCommand {
+public class WhatAmIPlaying implements ManualCommand {
 
     private final CommandHelper commandHelper;
 

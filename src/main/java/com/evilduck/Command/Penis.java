@@ -1,7 +1,7 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Tools.IsACommand;
-import com.evilduck.Configuration.MessageHandling.GenericCommand;
+import com.evilduck.Configuration.MessageHandling.ManualCommand;
 import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @IsACommand
-public class Penis implements GenericCommand {
+public class Penis implements ManualCommand {
 
     private final BigDickRepository bigDickRepository;
 

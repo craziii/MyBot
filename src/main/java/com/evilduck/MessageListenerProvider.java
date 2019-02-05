@@ -1,6 +1,6 @@
 package com.evilduck;
 
-import com.evilduck.Configuration.MessageHandling.CommandGateway;
+import com.evilduck.Configuration.MessageHandling.MessageGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 public class MessageListenerProvider {
 
     @Bean
-    public MessageListener messageListenerBean(final CommandGateway commandGateway) {
-        return new MessageListener(commandGateway);
+    public MessageListener messageListenerBean(final MessageGateway messageGateway) {
+        return new MessageListener(messageGateway);
     }
     
 }

@@ -1,7 +1,7 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Tools.IsACommand;
-import com.evilduck.Configuration.MessageHandling.GenericCommand;
+import com.evilduck.Configuration.MessageHandling.ManualCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -18,7 +18,7 @@ import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 
 @Component
 @IsACommand
-public class Kick implements GenericCommand {
+public class Kick implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "kickChannel")

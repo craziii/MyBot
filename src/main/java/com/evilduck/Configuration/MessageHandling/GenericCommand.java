@@ -1,14 +1,12 @@
 package com.evilduck.Configuration.MessageHandling;
 
+import net.dv8tion.jda.core.entities.Message;
 
-import net.dv8tion.jda.core.entities.Member;
+import java.io.IOException;
 
+public interface GenericCommand {
 
-public interface GenericCommand extends AutoFireCommand {
+    void execute(final org.springframework.messaging.Message<Message> message) throws IOException;
 
-    boolean hasPermissionToRun(final Member requestingMember);
-
-    void onSuccess(final net.dv8tion.jda.core.entities.Message message);
-    void onFail(final Throwable throwable);
 
 }

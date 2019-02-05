@@ -60,7 +60,7 @@ public class TestCommand implements ManualCommand {
             sessionRepository.deleteById(session.get().getId());
         } else {
             if (args.get(1).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
-                    message.getPayload().getMember(),
+                    message.getPayload().getMember().getUser().getId(),
                     args.get(2)
             ));
         }

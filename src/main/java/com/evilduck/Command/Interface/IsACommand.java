@@ -13,9 +13,6 @@ public @interface IsACommand {
 
     boolean management() default false;
 
-    boolean automatic() default false;
-
-    boolean manual() default true;
-
+    boolean callable() default true;
 
 }

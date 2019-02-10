@@ -59,7 +59,7 @@ public class CommandHelper {
             argsStringBuilder.append(args.get(i))
                     .append(" ");
         }
-        return argsStringBuilder.toString();
+        return argsStringBuilder.toString().trim();
     }
 
     public List<CommandDetail> matchCommandString(final String commandString) {

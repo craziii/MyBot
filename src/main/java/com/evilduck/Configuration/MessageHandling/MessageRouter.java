@@ -6,14 +6,19 @@ import com.evilduck.Repository.CommandDetailRepository;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.Router;
+import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 public class MessageRouter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageRouter.class);
 
     private final CommandDetailRepository commandDetailRepository;
     private final CommandHelper commandHelper;
@@ -44,18 +49,21 @@ public class MessageRouter {
             throw new MatchedTooManyCommandsException("Message matched more than one command, message: \'" +
                     message +
                     "\', matched commands: " + matchedCommands.toString());
-        } else
+        } else {
+            LOGGER.info("No explicit Commands matched, checking AutoFire Commands.");
             return "autoFireCommandChannel";
+        }
 
-    }
-
-    private boolean callableCommandExists(String rawCommand) {
-        return commandDetailRepository.findOneByFullCommand(rawCommand) != null;
     }
 
     private String getCommandString(final String rawCommand) {
         return rawCommand.replace("!", "").split(" ")[0];
     }
 
+    public PublishSubscribeChannel autoFireCommandChannel() {
+//        final PublishSubscribeChannel publishSubscribeChannel = new PublishSubscribeChannel();
+//        publishSubscribeChannel.
+        return new PublishSubscribeChannel();
+    }
 
 }

@@ -55,13 +55,13 @@ public class TestCommand implements ManualCommand {
             message.getPayload()
                     .getTextChannel()
                     .sendMessage("I have found a session for you!\nYou saved: " +
-                            session.get().getSavedDetail().toString())
+                            session.get().getSavedDetail())
                     .queue();
             sessionRepository.deleteById(session.get().getId());
         } else {
             if (args.get(1).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
                     message.getPayload().getMember().getUser().getId(),
-                    args.get(2)
+                    commandHelper.getArgsAsString(rawMessage, 2)
             ));
         }
 

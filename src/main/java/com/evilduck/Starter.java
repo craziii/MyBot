@@ -5,6 +5,7 @@ import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
+import net.dv8tion.jda.core.JDA;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +36,19 @@ public final class Starter {
     private final CommandDetailRepository commandDetailRepository;
     private final String commandPackagePath;
     private final MessageChannelConfiguration messageChannelConfiguration;
+    private final JDA jda;
 
     @Autowired
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
                    @Value("${command.package}") final String commandPackagePath,
-                   final MessageChannelConfiguration messageChannelConfiguration) {
+                   final MessageChannelConfiguration messageChannelConfiguration,
+                   final JDA jda) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
         this.commandPackagePath = commandPackagePath;
         this.messageChannelConfiguration = messageChannelConfiguration;
+        this.jda = jda;
     }
 
     @PostConstruct
@@ -97,6 +102,11 @@ public final class Starter {
                         .useDelimiter("\\Z").next())
                 .orElse(null);
         return introAsciiArt.isSuccess() ? introAsciiArt.get() : "";
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        LOGGER.info("JeffBot is Shutting down...");
     }
 
 }

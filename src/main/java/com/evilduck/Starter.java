@@ -1,6 +1,7 @@
 package com.evilduck;
 
 import com.evilduck.Command.Interface.IsACommand;
+import com.evilduck.Configuration.MessageHandling.MessageChannelConfiguration;
 import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;

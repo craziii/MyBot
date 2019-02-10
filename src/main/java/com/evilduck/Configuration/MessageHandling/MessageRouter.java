@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.Router;
-import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -58,12 +57,6 @@ public class MessageRouter {
 
     private String getCommandString(final String rawCommand) {
         return rawCommand.replace("!", "").split(" ")[0];
-    }
-
-    public PublishSubscribeChannel autoFireCommandChannel() {
-//        final PublishSubscribeChannel publishSubscribeChannel = new PublishSubscribeChannel();
-//        publishSubscribeChannel.
-        return new PublishSubscribeChannel();
     }
 
 }

@@ -76,7 +76,6 @@ public class Play implements ManualCommand {
                             audioManager.openAudioConnection(voiceChannel);
                         }
                         trackScheduler.queue(track);
-//                        audioPlayer.playTrack(track);
                     }
 
                     @Override

@@ -1,6 +1,6 @@
 
- version:       0.25.34.BETA (version.major.minor+opt+bug.release)
- major change:  25
- minor change:  18
+ version:       0.31.36.BETA (version.major.minor+opt+bug.release)
+ major change:  31
+ minor change:  20
  optimizations: 7
  bug fixes:     9

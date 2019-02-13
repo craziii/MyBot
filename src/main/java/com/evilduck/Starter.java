@@ -1,12 +1,10 @@
 package com.evilduck;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Configuration.MessageHandling.MessageChannelConfiguration;
 import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
-import net.dv8tion.jda.core.JDA;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,20 +34,14 @@ public final class Starter {
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
     private final String commandPackagePath;
-    private final MessageChannelConfiguration messageChannelConfiguration;
-    private final JDA jda;
 
     @Autowired
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
-                   @Value("${command.package}") final String commandPackagePath,
-                   final MessageChannelConfiguration messageChannelConfiguration,
-                   final JDA jda) {
+                   @Value("${command.package}") final String commandPackagePath) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
         this.commandPackagePath = commandPackagePath;
-        this.messageChannelConfiguration = messageChannelConfiguration;
-        this.jda = jda;
     }
 
     @PostConstruct
@@ -57,8 +49,6 @@ public final class Starter {
 
         LOGGER.info("JeffBot is starting...");
         System.out.println(loadStartupText());
-
-        messageChannelConfiguration.instantiateMessageChannels();
 
         final StringBuilder outputListString = new StringBuilder();
         for (final String defaultProfile : environment.getDefaultProfiles())
@@ -80,12 +70,13 @@ public final class Starter {
             if (isACommand.isPresent()) {
                 final String commandName = commandClass.getSimpleName();
                 final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
+
                 commandDetail.setDescription(isACommand.get().description());
+                commandDetail.setTutorial(isACommand.get().aliases());
 
                 LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
                         commandDetail.getFullCommand(),
                         commandDetail.getAliases());
-
                 commandDetailList.add(commandDetail);
             }
         });

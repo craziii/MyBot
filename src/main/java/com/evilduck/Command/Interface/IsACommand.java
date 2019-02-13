@@ -11,6 +11,8 @@ public @interface IsACommand {
 
     String description() default "";
 
+    String aliases() default "";
+
     boolean management() default false;
 
     boolean callable() default true;

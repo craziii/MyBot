@@ -17,6 +17,7 @@ public class CommandDetail {
     private String camelCaseAlias;
     private String description;
     private List<String> aliases;
+    private String tutorial;
 
     public CommandDetail(final String fullCommand) {
         this.fullCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, fullCommand);
@@ -48,6 +49,14 @@ public class CommandDetail {
         this.description = description;
     }
 
+    public String getTutorial() {
+        return tutorial;
+    }
+
+    public void setTutorial(final String tutorial) {
+        this.tutorial = tutorial;
+    }
+
     public List<String> getAliases() {
         return aliases;
     }
@@ -76,10 +85,14 @@ public class CommandDetail {
 
     @Override
     public String toString() {
-        return "IsACommand{" +
+        return "CommandDetail{" +
                 "id='" + id + '\'' +
                 ", fullCommand='" + fullCommand + '\'' +
+                ", camelCaseAlias='" + camelCaseAlias + '\'' +
+                ", description='" + description + '\'' +
                 ", aliases=" + aliases +
+                ", aliases='" + tutorial + '\'' +
                 '}';
     }
+
 }

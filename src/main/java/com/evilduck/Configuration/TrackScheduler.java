@@ -5,10 +5,12 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Component
 public class TrackScheduler implements AudioEventListener {
 
     private final AudioPlayer audioPlayer;
@@ -17,6 +19,7 @@ public class TrackScheduler implements AudioEventListener {
     @Autowired
     public TrackScheduler(final AudioPlayer audioPlayer) {
         this.audioPlayer = audioPlayer;
+        audioPlayer.addListener(this);
         this.queue = new LinkedBlockingQueue<>();
     }
 

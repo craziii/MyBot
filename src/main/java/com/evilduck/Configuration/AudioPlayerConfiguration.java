@@ -22,11 +22,11 @@ public class AudioPlayerConfiguration {
         return audioPlayerManager.createPlayer();
     }
 
-    @Bean
-    public TrackScheduler trackScheduler(final AudioPlayer audioPlayer) {
-        final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer);
-        audioPlayer.addListener(trackScheduler);
-        return trackScheduler;
-    }
+//    @Bean
+//    public TrackScheduler trackScheduler(final AudioPlayer audioPlayer) {
+//        final TrackScheduler trackScheduler = new TrackScheduler(audioPlayer);
+//        audioPlayer.addListener(trackScheduler);
+//        return trackScheduler;
+//    }
 
 }

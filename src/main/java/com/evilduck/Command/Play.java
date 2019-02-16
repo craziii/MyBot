@@ -2,20 +2,18 @@ package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
 import com.evilduck.Command.Interface.ManualCommand;
-import com.evilduck.Configuration.AudioPlayerSendHandler;
+import com.evilduck.Configuration.AudioResultHandler;
 import com.evilduck.Configuration.TrackScheduler;
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.evilduck.Exception.UserNotInVoiceChannelException;
+import com.evilduck.Util.CommandHelper;
+import com.jecklgamis.util.Try;
+import com.jecklgamis.util.TryFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
-import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -33,16 +31,16 @@ public class Play implements ManualCommand {
     private final AudioPlayerManager audioPlayerManager;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
-    private final JDA jda;
+    private final CommandHelper commandHelper;
 
     public Play(final AudioPlayerManager audioPlayerManager,
                 final AudioPlayer audioPlayer,
                 final TrackScheduler trackScheduler,
-                final JDA jda) {
+                final CommandHelper commandHelper) {
         this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayer;
         this.trackScheduler = trackScheduler;
-        this.jda = jda;
+        this.commandHelper = commandHelper;
     }
 
     @Override
@@ -63,36 +61,44 @@ public class Play implements ManualCommand {
     @Override
     @ServiceActivator(inputChannel = "playChannel")
     public void execute(final org.springframework.messaging.Message<Message> message) throws IOException {
-        audioPlayerManager.loadItem("https://www.youtube.com/watch?v=QgydTdThoeA&ab_channel=SamO%27NellaAcademy",
-                new AudioLoadResultHandler() {
-                    @Override
-                    public void trackLoaded(AudioTrack track) {
-                        LOGGER.info("Loaded Track");
-                        final Guild guild = message.getPayload().getGuild();
-                        final AudioManager audioManager = message.getPayload().getTextChannel().getGuild().getAudioManager();
-                        audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
-                        final List<VoiceChannel> voiceChannels = guild.getVoiceChannels();
-                        for (VoiceChannel voiceChannel : voiceChannels) {
-                            audioManager.openAudioConnection(voiceChannel);
-                        }
-                        trackScheduler.queue(track);
-                    }
 
-                    @Override
-                    public void playlistLoaded(AudioPlaylist playlist) {
-                        LOGGER.info("Loaded Playlist");
-                    }
+        final TextChannel originChannel = message.getPayload().getTextChannel();
+        final List<String> args = commandHelper.getArgs(message.getPayload().getContentRaw());
+        if (args.size() < 2) {
+            originChannel.sendMessage("You must specify a link to play!").queue();
+            return;
+        }
 
-                    @Override
-                    public void noMatches() {
-                        LOGGER.info("No Matches");
-                    }
+        final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
+                message.getPayload().getAuthor().getId(),
+                message.getPayload().getGuild().getVoiceChannels());
+        if (voiceChannelTry.isFailure()) {
+            originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
+            return;
+        }
 
-                    @Override
-                    public void loadFailed(FriendlyException exception) {
-                        LOGGER.info("Failed to Load Track");
-                    }
-                });
+        startPlayFromLink(message, args, voiceChannelTry);
+    }
+
+    private void startPlayFromLink(org.springframework.messaging.Message<Message> message, List<String> args, Try<VoiceChannel> voiceChannelTry) {
+        audioPlayerManager.loadItem(args.get(1),
+                new AudioResultHandler(message.getPayload(),
+                        voiceChannelTry.get(),
+                        audioPlayer,
+                        trackScheduler));
+    }
+
+    private static Try<VoiceChannel> getVoiceChannelByUserId(String id, List<VoiceChannel> voiceChannels) {
+        return TryFactory.attempt(() -> voiceChannels.stream()
+                .filter(vc -> vc.getMembers()
+                        .stream()
+                        .anyMatch(m -> m.getUser()
+                                .getId()
+                                .equals(id)))
+                .findFirst()
+                .orElseThrow(() -> new UserNotInVoiceChannelException("User " +
+                        id +
+                        " not found in any voice channels!")));
     }
 
 }

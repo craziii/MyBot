@@ -1,4 +1,4 @@
-package com.evilduck.Command;
+package com.evilduck.Command.Audio;
 
 import com.evilduck.Command.Interface.IsACommand;
 import com.evilduck.Command.Interface.ManualCommand;

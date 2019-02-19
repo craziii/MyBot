@@ -27,7 +27,7 @@ public class Poll implements ManualCommand {
     }
 
     @Override
-    public void execute(org.springframework.messaging.Message<Message> message) throws IOException {
+    public void execute(Message message) throws IOException {
 
     }
 }

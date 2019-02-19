@@ -28,11 +28,10 @@ public class SteamKey implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "steamKeyChannel")
-    public void execute(org.springframework.messaging.Message<Message> message) {
-        final Message steamKeyMessage = message.getPayload();
-        final MessageChannel originChannel = steamKeyMessage.getTextChannel();
+    public void execute(Message message) {
+        final MessageChannel originChannel = message.getTextChannel();
 
-        final List<String> args = commandHelper.getArgs(message.getPayload().getContentRaw());
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
         if (args.size() < 2) {
             originChannel.sendMessage("Please provide a steam key to use this command!").queue();
             return;
@@ -42,7 +41,7 @@ public class SteamKey implements ManualCommand {
         final int expiry = args.size() > 2 ? parseInt(args.get(2)) : -1;
 
 
-        originChannel.deleteMessageById(steamKeyMessage.getId()).queue();
+        originChannel.deleteMessageById(message.getId()).queue();
         final String messageId = originChannel.sendMessage("Dropping steam key in: " + 5 + "s...").complete().getId();
 
         final Timer timer = new Timer();

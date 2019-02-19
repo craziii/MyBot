@@ -49,12 +49,12 @@ public class BannedPhrase implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "bannedPhraseChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) throws IOException {
-        final Member member = message.getPayload().getMember();
-        final TextChannel textChannel = message.getPayload()
+    public void execute(final Message message) throws IOException {
+        final Member member = message.getMember();
+        final TextChannel textChannel = message
                 .getTextChannel();
         if (hasPermissionToRun(member)) {
-            final String contentRaw = message.getPayload().getContentRaw();
+            final String contentRaw = message.getContentRaw();
             final String action = commandHelper.getArgs(contentRaw).get(1);
             final String proposedBannedPhrase = commandHelper.getArgsAsString(contentRaw, 2)
                     .trim()

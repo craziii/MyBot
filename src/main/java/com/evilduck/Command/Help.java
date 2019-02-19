@@ -43,7 +43,7 @@ public class Help implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "helpChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) throws IOException {
+    public void execute(final Message message) throws IOException {
         final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();
 
         final EmbedBuilder helpEmbed = new EmbedBuilder()
@@ -55,7 +55,7 @@ public class Help implements ManualCommand {
                         .addBlankField(false));
 
         final MessageEmbed build = helpEmbed.build();
-        message.getPayload().getTextChannel().sendMessage(build).queue();
+        message.getTextChannel().sendMessage(build).queue();
 
     }
 }

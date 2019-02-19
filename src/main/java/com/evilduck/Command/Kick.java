@@ -22,14 +22,14 @@ public class Kick implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "kickChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) {
+    public void execute(final Message message) {
 
-        if (!hasPermissionToRun(message.getPayload().getMember()))
+        if (!hasPermissionToRun(message.getMember()))
             throw new PermissionException(KICK_MEMBERS.getName());
 
-        final TextChannel channel = message.getPayload().getTextChannel();
-        final List<User> mentionedUsers = message.getPayload().getMentionedUsers();
-        final Guild guild = message.getPayload().getGuild();
+        final TextChannel channel = message.getTextChannel();
+        final List<User> mentionedUsers = message.getMentionedUsers();
+        final Guild guild = message.getGuild();
         final Member selfMember = guild.getSelfMember();
 
         verifyCommandToRun(channel, mentionedUsers, selfMember);

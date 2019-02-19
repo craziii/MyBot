@@ -33,18 +33,17 @@ public class CheckBannedPhrase implements GenericCommand {
 
     @Override
     @ServiceActivator(inputChannel = "autoFireCommandChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) {
+    public void execute(final Message message) {
         LOGGER.info("Checking message for banned phrases...");
-        final String rawMessage = commandHelper.getArgsAsString(message.getPayload().getContentRaw(), 0);
-        final List<String> matches = commandHelper.getArgs(message.getPayload()
-                .getContentRaw()).stream()
+        final String rawMessage = commandHelper.getArgsAsString(message.getContentRaw(), 0);
+        final List<String> matches = commandHelper.getArgs(message.getContentRaw()).stream()
                 .filter(arg -> bannedPhraseRepository.findById(arg.toLowerCase()).isPresent())
                 .collect(toList());
         if (matches.size() > 0 || bannedPhraseRepository.findById(rawMessage).isPresent()) {
             LOGGER.info("Message matched {} banned phrases", matches.size());
-            message.getPayload().getTextChannel()
+            message.getTextChannel()
                     .sendMessage("Banned Phrase said my user: " +
-                            message.getPayload().getAuthor().getAsMention())
+                            message.getAuthor().getAsMention())
                     .queue();
         } else {
             LOGGER.info("No Banned Phrases found in message");

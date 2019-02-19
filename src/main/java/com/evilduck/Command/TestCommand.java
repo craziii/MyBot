@@ -7,6 +7,7 @@ import com.evilduck.Repository.SessionRepository;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
@@ -45,28 +46,28 @@ public class TestCommand implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "testCommandChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) {
+    public void execute(final Message message) {
 
-        final String rawMessage = message.getPayload().getContentRaw();
+        final String rawMessage = message.getContentRaw();
         final List<String> args = commandHelper.getArgs(rawMessage);
 
-        final Optional<SessionEntity> session = getSessionIfExists(message.getPayload().getMember());
+        final Optional<SessionEntity> session = getSessionIfExists(message.getMember());
         if (session.isPresent()) {
-            message.getPayload()
-                    .getTextChannel()
+            message.getTextChannel()
                     .sendMessage("I have found a session for you!\nYou saved: " +
                             session.get().getSavedDetail())
                     .queue();
             sessionRepository.deleteById(session.get().getId());
         } else {
             if (args.get(1).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
-                    message.getPayload().getMember().getUser().getId(),
+                    message.getMember().getUser().getId(),
                     commandHelper.getArgsAsString(rawMessage, 2)
             ));
         }
 
     }
 
+    @NotNull
     private Optional<SessionEntity> getSessionIfExists(final Member member) {
         return sessionRepository.findById(member.getUser().getId());
     }

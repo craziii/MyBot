@@ -5,10 +5,10 @@ import com.evilduck.Command.Interface.ManualCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.awt.Color;
@@ -24,10 +24,10 @@ public class Ping implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "pingChannel")
-    public void execute(final Message<net.dv8tion.jda.core.entities.Message> message) {
-        LOGGER.info("Received: {}", message.getPayload().getContentRaw());
-        final TextChannel originTextChannel = message.getPayload().getTextChannel();
-        final long pingValue = message.getPayload().getJDA().getPing();
+    public void execute(final Message message) {
+        LOGGER.info("Received: {}", message.getContentRaw());
+        final TextChannel originTextChannel = message.getTextChannel();
+        final long pingValue = message.getJDA().getPing();
         final PingIndicator pingIndicator = getIndicatorForPing(pingValue);
 
         final MessageBuilder messageBuilder = new MessageBuilder();

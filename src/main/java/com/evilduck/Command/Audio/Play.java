@@ -60,18 +60,18 @@ public class Play implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "playChannel")
-    public void execute(final org.springframework.messaging.Message<Message> message) throws IOException {
+    public void execute(final Message message) throws IOException {
 
-        final TextChannel originChannel = message.getPayload().getTextChannel();
-        final List<String> args = commandHelper.getArgs(message.getPayload().getContentRaw());
+        final TextChannel originChannel = message.getTextChannel();
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
         if (args.size() < 2) {
             originChannel.sendMessage("You must specify a link to play!").queue();
             return;
         }
 
         final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
-                message.getPayload().getAuthor().getId(),
-                message.getPayload().getGuild().getVoiceChannels());
+                message.getAuthor().getId(),
+                message.getGuild().getVoiceChannels());
         if (voiceChannelTry.isFailure()) {
             originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
             return;
@@ -80,9 +80,11 @@ public class Play implements ManualCommand {
         startPlayFromLink(message, args, voiceChannelTry);
     }
 
-    private void startPlayFromLink(org.springframework.messaging.Message<Message> message, List<String> args, Try<VoiceChannel> voiceChannelTry) {
+    private void startPlayFromLink(final Message message,
+                                   final List<String> args,
+                                   final Try<VoiceChannel> voiceChannelTry) {
         audioPlayerManager.loadItem(args.get(1),
-                new AudioResultHandler(message.getPayload(),
+                new AudioResultHandler(message,
                         voiceChannelTry.get(),
                         audioPlayer,
                         trackScheduler));

@@ -22,14 +22,13 @@ public class Penis implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "penisChannel")
-    public void execute(org.springframework.messaging.Message<Message> message) {
-        final int penisLength = bigDickRepository.findById(message.getPayload()
-                .getAuthor().getId()).isPresent() ? 100 : 1;
+    public void execute(Message message) {
+        final int penisLength = bigDickRepository.findById(
+                message.getAuthor().getId()).isPresent() ? 100 : 1;
 
-        message.getPayload()
-                .getTextChannel()
+        message.getTextChannel()
                 .sendMessage(":eggplant: " +
-                        message.getPayload().getAuthor().getAsMention() +
+                        message.getAuthor().getAsMention() +
                         "'s penis length is " +
                         penisLength +
                         " inches long :3")

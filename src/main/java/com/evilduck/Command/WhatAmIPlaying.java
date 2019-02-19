@@ -28,9 +28,9 @@ public class WhatAmIPlaying implements ManualCommand {
 
     @Override
     @ServiceActivator(inputChannel = "whatAmIPlayingChannel")
-    public void execute(org.springframework.messaging.Message<Message> message) {
+    public void execute(final Message message) {
 
-        final List<String> args = commandHelper.getArgs(message.getPayload().getContentRaw());
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
 
         final Game whatIAmPlaying;
         final GameType gameType;
@@ -50,20 +50,18 @@ public class WhatAmIPlaying implements ManualCommand {
             whatIAmPlaying = Game.of(DEFAULT, gameArg);
 
         } else {
-            message.getPayload()
-                    .getTextChannel()
+            message.getTextChannel()
                     .sendMessage("You must specify a what i'm playing!")
                     .queue();
             return;
         }
 
-        message.getPayload()
-                .getJDA()
+        message.getJDA()
                 .getPresence()
                 .setGame(whatIAmPlaying);
 
 
-        message.getPayload().getTextChannel()
+        message.getTextChannel()
                 .sendMessage(new EmbedBuilder().setTitle("I have changed what I'm doing!")
                         .setDescription("I am now " +
                                 (

@@ -15,7 +15,7 @@ public class CommandFormatter {
 
     @Transformer
     public Message<net.dv8tion.jda.core.entities.Message> transform(final Message<net.dv8tion.jda.core.entities.Message> message) {
-        LOGGER.info("Transforming message {}", message.getPayload().getId());
+        LOGGER.info("Transforming message: [ ID: {}, CONTENT: {} ]", message.getPayload().getId(), message.getPayload().getContentRaw());
         return withPayload(message.getPayload()).setHeader("args", getCommandArgs(message.getPayload().getContentRaw())).build();
     }
 

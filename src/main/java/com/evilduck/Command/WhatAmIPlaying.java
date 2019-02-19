@@ -1,7 +1,7 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PrivateCommand;
 import com.evilduck.Util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -18,7 +18,7 @@ import static net.dv8tion.jda.core.entities.Game.GameType.*;
 //  TODO: WORK IN PROGRESS!
 @Component
 @IsACommand
-public class WhatAmIPlaying implements ManualCommand {
+public class WhatAmIPlaying implements PrivateCommand {
 
     private final CommandHelper commandHelper;
 
@@ -75,16 +75,6 @@ public class WhatAmIPlaying implements ManualCommand {
     @Override
     public boolean hasPermissionToRun(Member requestingMember) {
         return false;
-    }
-
-    @Override
-    public void onSuccess(Message message) {
-
-    }
-
-    @Override
-    public void onFail(Throwable throwable) {
-
     }
 
 }

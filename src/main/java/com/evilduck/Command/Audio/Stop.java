@@ -1,7 +1,8 @@
 package com.evilduck.Command.Audio;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PrivateCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Configuration.TrackScheduler;
 import com.evilduck.Util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Component
 @IsACommand
-public class Stop implements ManualCommand {
+public class Stop implements PrivateCommand, UnstableCommand {
 
     private final CommandHelper commandHelper;
     private final AudioPlayer audioPlayer;

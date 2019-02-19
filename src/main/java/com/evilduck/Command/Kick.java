@@ -1,7 +1,8 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PrivateCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -18,7 +19,7 @@ import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 
 @Component
 @IsACommand
-public class Kick implements ManualCommand {
+public class Kick implements PrivateCommand, UnstableCommand {
 
     @Override
     @ServiceActivator(inputChannel = "kickChannel")

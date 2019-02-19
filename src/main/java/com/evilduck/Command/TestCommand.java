@@ -1,7 +1,9 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PrivateCommand;
+import com.evilduck.Command.Interface.PublicCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Entity.SessionEntity;
 import com.evilduck.Repository.SessionRepository;
 import com.evilduck.Util.CommandHelper;
@@ -17,7 +19,7 @@ import java.util.Optional;
 
 @Component
 @IsACommand
-public class TestCommand implements ManualCommand {
+public class TestCommand implements PublicCommand, UnstableCommand, PrivateCommand {    // DON'T TRY THIS AT HOME KIDS!
 
     private final SessionRepository sessionRepository;
     private final CommandHelper commandHelper;

@@ -1,9 +1,8 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PublicCommand;
 import com.evilduck.Util.CommandHelper;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -18,7 +17,7 @@ import static org.joda.time.DateTime.now;
 
 @Component
 @IsACommand
-public class SteamKey implements ManualCommand {
+public class SteamKey implements PublicCommand {
 
     private final CommandHelper commandHelper;
 
@@ -53,21 +52,6 @@ public class SteamKey implements ManualCommand {
         if (expiry > 0)
             timer.schedule(new SteamKeyDelete(originChannel, messageId),
                     now().plusSeconds(expiry + 5).toDate());
-
-    }
-
-    @Override
-    public boolean hasPermissionToRun(Member requestingMember) {
-        return false;
-    }
-
-    @Override
-    public void onSuccess(Message message) {
-
-    }
-
-    @Override
-    public void onFail(Throwable throwable) {
 
     }
 

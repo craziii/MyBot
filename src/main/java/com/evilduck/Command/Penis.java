@@ -1,9 +1,9 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PublicCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Repository.BigDickRepository;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @IsACommand
-public class Penis implements ManualCommand {
+public class Penis implements PublicCommand, UnstableCommand {
 
     private final BigDickRepository bigDickRepository;
 
@@ -33,11 +33,6 @@ public class Penis implements ManualCommand {
                         penisLength +
                         " inches long :3")
                 .queue();
-    }
-
-    @Override
-    public boolean hasPermissionToRun(Member requestingMember) {
-        return false;
     }
 
     @Override

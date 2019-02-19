@@ -1,7 +1,8 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PrivateCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Entity.BannedPhraseEntity;
 import com.evilduck.Repository.BannedPhraseRepository;
 import com.evilduck.Util.CommandHelper;
@@ -20,7 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isAlphanumeric;
 
 @Component
 @IsACommand(management = true, description = "Allows adding and removing banned phrases for this server", aliases = "!bp or !bannedPhrase")
-public class BannedPhrase implements ManualCommand {
+public class BannedPhrase implements PrivateCommand, UnstableCommand {
 
     private final BannedPhraseRepository bannedPhraseRepository;
     private final CommandHelper commandHelper;

@@ -1,10 +1,10 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PublicCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 @IsACommand
-public class Ping implements ManualCommand {
+public class Ping implements PublicCommand, UnstableCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);
 
@@ -40,11 +40,6 @@ public class Ping implements ManualCommand {
 
         messageBuilder.setEmbed(embedBuilder.build());
         originTextChannel.sendMessage(messageBuilder.build()).queue();
-    }
-
-    @Override
-    public boolean hasPermissionToRun(Member requestingMember) {
-        return false;
     }
 
     @Override

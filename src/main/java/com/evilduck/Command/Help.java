@@ -1,11 +1,10 @@
 package com.evilduck.Command;
 
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.PublicCommand;
 import com.evilduck.Entity.CommandDetail;
 import com.evilduck.Repository.CommandDetailRepository;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,28 +16,13 @@ import java.util.List;
 
 @Component
 @IsACommand(description = "Displays information about every command this bot has", aliases = "Use \'!h\' or \'!help\' to use")
-public class Help implements ManualCommand {
+public class Help implements PublicCommand {
 
     private final CommandDetailRepository commandDetailRepository;
 
     @Autowired
     public Help(final CommandDetailRepository commandDetailRepository) {
         this.commandDetailRepository = commandDetailRepository;
-    }
-
-    @Override
-    public boolean hasPermissionToRun(Member requestingMember) {
-        return true;
-    }
-
-    @Override
-    public void onSuccess(Message message) {
-
-    }
-
-    @Override
-    public void onFail(Throwable throwable) {
-
     }
 
     @Override

@@ -1,7 +1,8 @@
 package com.evilduck.Command.Audio;
 
+import com.evilduck.Command.Interface.GenericCommand;
 import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Command.Interface.ManualCommand;
+import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Configuration.AudioResultHandler;
 import com.evilduck.Configuration.TrackScheduler;
 import com.evilduck.Exception.UserNotInVoiceChannelException;
@@ -10,7 +11,6 @@ import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -24,7 +24,7 @@ import java.util.List;
 
 @Component
 @IsACommand
-public class Play implements ManualCommand {
+public class Play implements GenericCommand, UnstableCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
 
@@ -41,11 +41,6 @@ public class Play implements ManualCommand {
         this.audioPlayer = audioPlayer;
         this.trackScheduler = trackScheduler;
         this.commandHelper = commandHelper;
-    }
-
-    @Override
-    public boolean hasPermissionToRun(final Member requestingMember) {
-        return false;
     }
 
     @Override

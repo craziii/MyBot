@@ -33,8 +33,7 @@ public class Kick implements PrivateCommand, UnstableCommand {
         final Guild guild = message.getGuild();
         final Member selfMember = guild.getSelfMember();
 
-        verifyCommandToRun(channel, mentionedUsers, selfMember);
-
+        if (verifyCommandToRun(channel, message.getMentionedMembers(), selfMember)) return;
 
         for (final User mentionedUser : mentionedUsers) {
             final Member mentionedMember = guild.getMember(mentionedUser);
@@ -68,15 +67,21 @@ public class Kick implements PrivateCommand, UnstableCommand {
     }
 
 
-    private void verifyCommandToRun(final TextChannel channel,
-                                    final List<User> mentionedUsers,
-                                    final Member selfMember) {
+    private boolean verifyCommandToRun(final TextChannel channel,
+                                       final List<Member> mentionedMembers,
+                                       final Member selfMember) {
         if (!selfMember.hasPermission(KICK_MEMBERS))
             channel.sendMessage("I do not have permission to kick members").queue();
-        else if (mentionedUsers.size() == 0)
+        else if (mentionedMembers.size() == 0)
             channel.sendMessage("Please mention the user you want to kick").queue();
-        else if (mentionedUsers.size() > 1)
+        else if (mentionedMembers.size() > 1)
             channel.sendMessage("Please only specify one user to kick at a time").queue();
+        else if (mentionedMembers.stream().anyMatch(member -> !selfMember.canInteract(member)))
+            channel.sendMessage("You cannot interact with this member").queue();
+        else
+            return true;
+
+        return false;
     }
 
     @Override

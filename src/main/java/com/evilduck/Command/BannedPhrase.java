@@ -20,7 +20,11 @@ import static net.dv8tion.jda.core.Permission.*;
 import static org.apache.commons.lang3.StringUtils.isAlphanumeric;
 
 @Component
-@IsACommand(management = true, description = "Allows adding and removing banned phrases for this server", aliases = "!bp or !bannedPhrase")
+@IsACommand(
+        management = true,
+        description = "Allows adding and removing banned phrases for this server",
+        aliases = "!bp or !bannedPhrase"
+)
 public class BannedPhrase implements PrivateCommand, UnstableCommand {
 
     private final BannedPhraseRepository bannedPhraseRepository;

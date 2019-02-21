@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@IsACommand
+@IsACommand(aliases = {"p", "start"})
 public class Play implements GenericCommand, UnstableCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
@@ -56,7 +56,6 @@ public class Play implements GenericCommand, UnstableCommand {
     @Override
     @ServiceActivator(inputChannel = "playChannel")
     public void execute(final Message message) throws IOException {
-
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         if (args.size() < 2) {
@@ -72,20 +71,21 @@ public class Play implements GenericCommand, UnstableCommand {
             return;
         }
 
-        startPlayFromLink(message, args, voiceChannelTry);
+        startPlayFromLink(message, args.get(1), voiceChannelTry.get());
     }
 
     private void startPlayFromLink(final Message message,
-                                   final List<String> args,
-                                   final Try<VoiceChannel> voiceChannelTry) {
-        audioPlayerManager.loadItem(args.get(1),
-                new AudioResultHandler(message,
-                        voiceChannelTry.get(),
-                        audioPlayer,
-                        trackScheduler));
+                                   final String url,
+                                   final VoiceChannel voiceChannelTry) {
+        audioPlayerManager.loadItem(url, new AudioResultHandler(
+                message,
+                voiceChannelTry,
+                audioPlayer,
+                trackScheduler));
     }
 
-    private static Try<VoiceChannel> getVoiceChannelByUserId(String id, List<VoiceChannel> voiceChannels) {
+    private static Try<VoiceChannel> getVoiceChannelByUserId(final String id,
+                                                             final List<VoiceChannel> voiceChannels) {
         return TryFactory.attempt(() -> voiceChannels.stream()
                 .filter(vc -> vc.getMembers()
                         .stream()

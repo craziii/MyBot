@@ -8,6 +8,7 @@ import com.evilduck.Util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ public class Stop implements PrivateCommand, UnstableCommand {
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
 
+    @Autowired
     public Stop(final CommandHelper commandHelper,
                 final AudioPlayer audioPlayer,
                 final TrackScheduler trackScheduler) {
@@ -49,12 +51,8 @@ public class Stop implements PrivateCommand, UnstableCommand {
     @ServiceActivator(inputChannel = "stopChannel")
     public void execute(final Message message) throws IOException {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() > 1 && args.get(1).toLowerCase().matches("all")) {
-            trackScheduler.clear();
-            audioPlayer.stopTrack();
-        } else {
-            audioPlayer.stopTrack();
-        }
-
+        if (args.size() > 1 && args.get(1).toLowerCase().matches("all")) trackScheduler.clear();
+        audioPlayer.stopTrack();
     }
+
 }

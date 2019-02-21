@@ -23,6 +23,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.ResourceUtils.getFile;
 
@@ -71,8 +72,8 @@ public final class Starter {
                 final String commandName = commandClass.getSimpleName();
                 final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
 
+                commandDetail.setAliases(asList(isACommand.get().aliases()));
                 commandDetail.setDescription(isACommand.get().description());
-                commandDetail.setTutorial(isACommand.get().aliases());
 
                 LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
                         commandDetail.getFullCommand(),

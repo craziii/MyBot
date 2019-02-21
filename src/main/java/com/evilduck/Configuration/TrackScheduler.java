@@ -33,6 +33,10 @@ public class TrackScheduler implements AudioEventListener {
             queue.offer(audioTrack);
     }
 
+    public AudioTrack getLatestTrack() {
+        return queue.peek();
+    }
+
     public void clear() {
         queue.clear();
     }

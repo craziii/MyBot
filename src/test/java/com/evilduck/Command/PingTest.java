@@ -32,7 +32,7 @@ public class PingTest {
     private Ping ping;
 
     @Test
-    public void execute() {
+    public void shouldTrySendPingMessage() {
         when(message.getJDA()).thenReturn(jda);
         when(jda.getPing()).thenReturn(0L);
         when(message.getTextChannel()).thenReturn(textChannel);

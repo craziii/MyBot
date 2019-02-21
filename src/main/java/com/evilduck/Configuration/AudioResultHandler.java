@@ -5,7 +5,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.Logger;
@@ -39,6 +41,17 @@ public class AudioResultHandler implements AudioLoadResultHandler {
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
         trackScheduler.queue(track);
+        displayPlayingTrack(track, message.getTextChannel());
+    }
+
+
+    private static void displayPlayingTrack(final AudioTrack audioTrack, final TextChannel textChannel) {
+        textChannel.sendMessage(
+                new EmbedBuilder().setTitle("Latest Track")
+                        .addField("Title", audioTrack.getInfo().title, false)
+                        .addField("Duration", String.valueOf(audioTrack.getDuration()), false)
+                        .build())
+                .queue();
     }
 
     @Override
@@ -53,6 +66,11 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(final FriendlyException exception) {
-
+        LOGGER.info("Track Failed: {}", exception.toString());
+        message.getTextChannel()
+                .sendMessage("Failed to play track reason: ")
+                .append(exception.getLocalizedMessage())
+                .queue();
     }
+
 }

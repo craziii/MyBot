@@ -16,7 +16,6 @@ public class CommandHelper {
     private List commandDetailList;
     private final CommandDetailRepository commandDetailRepository;
 
-
     @Autowired
     public CommandHelper(final CommandDetailRepository commandDetailRepository) {
         this.commandDetailRepository = commandDetailRepository;

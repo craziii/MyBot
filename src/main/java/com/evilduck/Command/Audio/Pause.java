@@ -10,7 +10,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 @Component
-@IsACommand(aliases = {"p"})
+@IsACommand
 public class Pause implements PrivateCommand {
 
     private final AudioPlayer audioPlayer;

@@ -2,11 +2,11 @@ package com.evilduck.Session;
 
 import java.util.Map;
 
-public class Poll {
+public class PollSession {
 
     private final Map<String, Integer> options;
 
-    public Poll(final Map<String, Integer> options) {
+    public PollSession(final Map<String, Integer> options) {
         this.options = options;
     }
 

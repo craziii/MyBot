@@ -19,7 +19,9 @@ public class AudioPlayerConfiguration {
 
     @Bean
     public AudioPlayer audioPlayer(final AudioPlayerManager audioPlayerManager) {
-        return audioPlayerManager.createPlayer();
+        final AudioPlayer player = audioPlayerManager.createPlayer();
+        player.setVolume(25);
+        return player;
     }
 
 }

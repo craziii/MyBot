@@ -1,13 +1,12 @@
 package com.evilduck.Configuration;
 
+import com.evilduck.Util.AudioPlayerSupport;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.Logger;
@@ -20,16 +19,16 @@ public class AudioResultHandler implements AudioLoadResultHandler {
     private final Message message;
     private final VoiceChannel voiceChannel;
     private final AudioPlayer audioPlayer;
-    private final TrackScheduler trackScheduler;
+    private final AudioPlayerSupport audioPlayerSupport;
 
     public AudioResultHandler(final Message message,
                               final VoiceChannel voiceChannel,
                               final AudioPlayer audioPlayer,
-                              final TrackScheduler trackScheduler) {
+                              final AudioPlayerSupport audioPlayerSupport) {
         this.message = message;
         this.voiceChannel = voiceChannel;
         this.audioPlayer = audioPlayer;
-        this.trackScheduler = trackScheduler;
+        this.audioPlayerSupport = audioPlayerSupport;
     }
 
     @Override
@@ -40,19 +39,9 @@ public class AudioResultHandler implements AudioLoadResultHandler {
                 .getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
-        trackScheduler.queue(track);
-        displayPlayingTrack(track, message.getTextChannel());
+        audioPlayerSupport.play(track, message.getTextChannel());
     }
 
-
-    private static void displayPlayingTrack(final AudioTrack audioTrack, final TextChannel textChannel) {
-        textChannel.sendMessage(
-                new EmbedBuilder().setTitle("Latest Track")
-                        .addField("Title", audioTrack.getInfo().title, false)
-                        .addField("Duration", String.valueOf(audioTrack.getDuration()), false)
-                        .build())
-                .queue();
-    }
 
     @Override
     public void playlistLoaded(final AudioPlaylist playlist) {

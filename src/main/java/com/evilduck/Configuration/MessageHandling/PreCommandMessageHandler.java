@@ -1,10 +1,12 @@
 package com.evilduck.Configuration.MessageHandling;
 
+import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.messaging.MessageChannel;
@@ -34,9 +36,20 @@ public class PreCommandMessageHandler {
     public IntegrationFlow generalCommandFlow() {
         return IntegrationFlows.from(commandInputChannel)
                 .transform(commandFormatter)
+                .wireTap("incomingMessageLoggingChannel")
                 .filter(messageFilter)
                 .route(messageRouter)
                 .get();
+    }
+
+    @ServiceActivator(inputChannel = "incomingMessageLoggingChannel")
+    public void incomingMessageLogger(final Message message) {
+        LOGGER.info(" ========== ========== ========== ========== ==========");
+        LOGGER.info("Message Received, ID: {} ", message.getId());
+        LOGGER.info("Text Channel: {}", message.getTextChannel());
+        LOGGER.info("Author: {}", message.getAuthor());
+        LOGGER.info("Raw Content: {}", message.getContentRaw());
+        LOGGER.info(" ========== ========== ========== ========== ==========");
     }
 
 }

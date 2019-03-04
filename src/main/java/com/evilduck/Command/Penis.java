@@ -1,16 +1,14 @@
 package com.evilduck.Command;
 
-import com.evilduck.Command.Interface.IsACommand;
 import com.evilduck.Command.Interface.PublicCommand;
 import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Repository.BigDickRepository;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.stereotype.Component;
 
-@Component
-@IsACommand
+//@Component
+//@IsACommand
 public class Penis implements PublicCommand, UnstableCommand {
 
     private final BigDickRepository bigDickRepository;

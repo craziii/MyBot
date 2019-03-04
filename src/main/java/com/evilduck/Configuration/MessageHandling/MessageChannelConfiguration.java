@@ -21,5 +21,4 @@ public class MessageChannelConfiguration {
         return new PublishSubscribeChannel();
     }
 
-
 }

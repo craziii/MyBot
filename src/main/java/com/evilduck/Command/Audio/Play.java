@@ -6,6 +6,7 @@ import com.evilduck.Command.Interface.UnstableCommand;
 import com.evilduck.Configuration.AudioResultHandler;
 import com.evilduck.Configuration.TrackScheduler;
 import com.evilduck.Exception.UserNotInVoiceChannelException;
+import com.evilduck.Util.AudioPlayerSupport;
 import com.evilduck.Util.CommandHelper;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
@@ -32,15 +33,18 @@ public class Play implements GenericCommand, UnstableCommand {
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final CommandHelper commandHelper;
+    private final AudioPlayerSupport audioPlayerSupport;
 
     public Play(final AudioPlayerManager audioPlayerManager,
                 final AudioPlayer audioPlayer,
                 final TrackScheduler trackScheduler,
-                final CommandHelper commandHelper) {
+                final CommandHelper commandHelper,
+                final AudioPlayerSupport audioPlayerSupport) {
         this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayer;
         this.trackScheduler = trackScheduler;
         this.commandHelper = commandHelper;
+        this.audioPlayerSupport = audioPlayerSupport;
     }
 
     @Override
@@ -81,7 +85,7 @@ public class Play implements GenericCommand, UnstableCommand {
                 message,
                 voiceChannelTry,
                 audioPlayer,
-                trackScheduler));
+                audioPlayerSupport));
     }
 
     private static Try<VoiceChannel> getVoiceChannelByUserId(final String id,

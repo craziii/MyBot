@@ -43,7 +43,7 @@ public class Poll implements PublicCommand {
             // TODO: ADD CANCEL OPTION
             message.getTextChannel().sendMessage("You already have a poll, please send `poll cancel` to cancel your poll before starting a new one").queue();
         } else {
-            final PollSession newPoll = createNewPoll(args, pollSessionRepository);
+            final PollSession newPoll = createNewPoll(requesterId, args, pollSessionRepository);
             displayPollInTextChannel(message, newPoll);
         }
 
@@ -61,12 +61,13 @@ public class Poll implements PublicCommand {
         });
     }
 
-    private static PollSession createNewPoll(final List<String> args,
+    private static PollSession createNewPoll(final String requesterId,
+                                             final List<String> args,
                                              final PollSessionRepository pollSessionRepository) {
         final List<String> pollOptionList = args.subList(1, args.size());
         final Map<String, Integer> pollOptions = new ConcurrentHashMap<>();
         pollOptionList.forEach(arg -> pollOptions.put(arg, 0));
-        final PollSession pollSession = new PollSession(pollOptions);
+        final PollSession pollSession = new PollSession(requesterId, pollOptions);
         return pollSessionRepository.save(pollSession);
     }
 }

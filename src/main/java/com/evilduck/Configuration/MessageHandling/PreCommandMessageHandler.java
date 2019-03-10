@@ -35,9 +35,8 @@ public class PreCommandMessageHandler {
     @Bean
     public IntegrationFlow generalCommandFlow() {
         return IntegrationFlows.from(commandInputChannel)
-                .transform(commandFormatter)
-                .wireTap("incomingMessageLoggingChannel")
                 .filter(messageFilter)
+                .wireTap("incomingMessageLoggingChannel")
                 .route(messageRouter)
                 .get();
     }

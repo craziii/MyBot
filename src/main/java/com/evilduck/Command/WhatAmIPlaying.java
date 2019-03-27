@@ -36,8 +36,8 @@ public class WhatAmIPlaying implements PrivateCommand {
         final GameType gameType;
         final String gameArg;
 
-        if (args.size() > 2) {
-            final String gameTypeArg = args.get(1);
+        if (args.size() > 1) {
+            final String gameTypeArg = args.get(0);
             gameType = gameTypeArg.matches("(?i:listen.*)") ?
                     LISTENING : gameTypeArg.matches("(?i:stream.*)") ?
                     STREAMING : gameTypeArg.matches("(?i:watch.*)") ?
@@ -45,7 +45,7 @@ public class WhatAmIPlaying implements PrivateCommand {
 
             gameArg = commandHelper.getArgsAsAString(args, 2);
             whatIAmPlaying = gameType.equals(STREAMING) ? Game.of(gameType, gameArg, "www.fuckyou.com") : Game.of(gameType, gameArg);
-        } else if (args.size() == 2) {
+        } else if (args.size() == 1) {
             gameArg = commandHelper.getArgsAsAString(args, 1);
             whatIAmPlaying = Game.of(DEFAULT, gameArg);
 

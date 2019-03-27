@@ -11,14 +11,29 @@ import net.dv8tion.jda.core.entities.Message;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @IsACommand
 public class Poll implements PublicCommand {
+
+    private static final HashMap NUMBER_EMOJIS = new HashMap<Integer, String>() {{
+        put(0, ":zero:");
+        put(1, ":one:");
+        put(2, ":two:");
+        put(3, ":three:");
+        put(4, ":four:");
+        put(5, ":five:");
+        put(6, ":six:");
+        put(7, ":seven:");
+        put(8, ":eight:");
+        put(9, ":nine:");
+    }};
 
     private final PollSessionRepository pollSessionRepository;
     private final CommandHelper commandHelper;
@@ -36,38 +51,40 @@ public class Poll implements PublicCommand {
         final Optional<PollSession> userPoll = pollSessionRepository.findById(requesterId);
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
 
-        if (userPoll.isPresent()) {
-            if (args.get(1).matches("i?:(REMOVE|DELETE|STOP)")) {
-                pollSessionRepository.deleteById(requesterId);
+        if (args.size() > 0 && args.get(0).toUpperCase().matches("(REMOVE|DELETE|STOP|CANCEL)")) {
+            pollSessionRepository.deleteById(requesterId);
+        } else if (userPoll.isPresent()) {
+            if (args.isEmpty()) {
+                message.getTextChannel()
+                        .sendMessage("You already have a poll, please send `poll cancel` to cancel your poll before starting a new one")
+                        .queue();
             }
-            // TODO: ADD CANCEL OPTION
-            message.getTextChannel().sendMessage("You already have a poll, please send `poll cancel` to cancel your poll before starting a new one").queue();
-        } else {
-            final PollSession newPoll = createNewPoll(requesterId, args, pollSessionRepository);
-            displayPollInTextChannel(message, newPoll);
-        }
 
+        } else {
+            final PollSession newPoll = createNewPoll(requesterId);
+            displayPollInTextChannel(message, newPoll);
+            pollSessionRepository.save(newPoll);
+        }
     }
 
     private static void displayPollInTextChannel(final Message message,
                                                  final PollSession newPoll) {
         final EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(message.getAuthor().getName() + "'s Poll");
         final Map<String, Integer> options = newPoll.getOptions();
-        options.forEach((key, value) -> embedBuilder.addField(key, value.toString(), true));
+        final List<String> optionsKeys = new ArrayList<>(options.keySet());
+        for (int i = 0; i < options.size(); i++) embedBuilder.addField(String.valueOf(i), optionsKeys.get(i), true);
         embedBuilder.setDescription("Vote via the reaction icons below");
+
         message.getTextChannel().sendMessage(embedBuilder.build()).queue(success -> {
-            success.addReaction(EmojiParser.parseToUnicode(":white_check_mark:")).queue();
-            success.addReaction(EmojiParser.parseToUnicode(":x:")).queue();
+            final int numOfOptions = newPoll.getOptions().size();
+            for (int i = 0; i < numOfOptions; i++) success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
+            newPoll.setMessageId(success.getId());
         });
     }
 
-    private static PollSession createNewPoll(final String requesterId,
-                                             final List<String> args,
-                                             final PollSessionRepository pollSessionRepository) {
-        final List<String> pollOptionList = args.subList(1, args.size());
-        final Map<String, Integer> pollOptions = new ConcurrentHashMap<>();
-        pollOptionList.forEach(arg -> pollOptions.put(arg, 0));
-        final PollSession pollSession = new PollSession(requesterId, pollOptions);
-        return pollSessionRepository.save(pollSession);
+    private static PollSession createNewPoll(final String requesterId) {
+        final Map<String, Integer> pollOptions = new LinkedHashMap<>(); // TODO: TEST ORDER INERTION SAFETY
+        return new PollSession(requesterId, pollOptions);
     }
+    
 }

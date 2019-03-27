@@ -61,7 +61,7 @@ public class TestCommand implements PublicCommand, UnstableCommand, PrivateComma
                     .queue();
             sessionRepository.deleteById(session.get().getId());
         } else {
-            if (args.get(1).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
+            if (args.get(0).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
                     message.getMember().getUser().getId(),
                     commandHelper.getArgsAsString(rawMessage, 2)
             ));

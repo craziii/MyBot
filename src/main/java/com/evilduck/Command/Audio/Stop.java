@@ -51,7 +51,7 @@ public class Stop implements PrivateCommand, UnstableCommand {
     @ServiceActivator(inputChannel = "stopChannel")
     public void execute(final Message message) throws IOException {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() > 1 && args.get(1).toLowerCase().matches("all")) trackScheduler.clear();
+        if (args.size() > 0 && args.get(0).toLowerCase().matches("all")) trackScheduler.clear();
         audioPlayer.stopTrack();
     }
 

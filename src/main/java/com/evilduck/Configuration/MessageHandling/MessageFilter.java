@@ -20,7 +20,8 @@ public class MessageFilter {
     }
 
     private static boolean isValidCommand(final Message payload) {
-        return payload.getContentRaw().charAt(0) == '!'; // TODO: MAKE THIS CONFIGURABLE
+        return payload.getContentRaw().length() > 0
+                && payload.getContentRaw().charAt(0) == '!'; // TODO: MAKE THIS CONFIGURABLE
     }
 
 }

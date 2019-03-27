@@ -40,7 +40,7 @@ public class Volume implements PrivateCommand {
 
         if (args.size() < 2) originChannel.sendMessage("You have not specified a new volume!").queue();
 
-        final int volume = Integer.parseInt(args.get(1));
+        final int volume = Integer.parseInt(args.get(0));
         if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();
 
         audioPlayer.setVolume(volume);

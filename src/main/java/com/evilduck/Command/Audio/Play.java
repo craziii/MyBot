@@ -75,7 +75,7 @@ public class Play implements GenericCommand, UnstableCommand {
             return;
         }
 
-        startPlayFromLink(message, args.get(1), voiceChannelTry.get());
+        startPlayFromLink(message, args.get(0), voiceChannelTry.get());
     }
 
     private void startPlayFromLink(final Message message,

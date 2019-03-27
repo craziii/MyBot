@@ -31,13 +31,13 @@ public class SteamKey implements PublicCommand {
         final MessageChannel originChannel = message.getTextChannel();
 
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() < 2) {
+        if (args.isEmpty()) {
             originChannel.sendMessage("Please provide a steam key to use this command!").queue();
             return;
         }
 
-        final String steamKey = args.get(1);
-        final int expiry = args.size() > 2 ? parseInt(args.get(2)) : -1;
+        final String steamKey = args.get(0);
+        final int expiry = args.size() > 1 ? parseInt(args.get(1)) : -1;
 
 
         originChannel.deleteMessageById(message.getId()).queue();

@@ -5,9 +5,10 @@ import com.evilduck.Repository.CommandDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 @Component
@@ -28,7 +29,10 @@ public class CommandHelper {
     }
 
     public List<String> getArgs(final String rawContent) {
-        return asList(rawContent.split(" "));
+        final String cleanRawContent = rawContent.replaceAll("\\P{Print}", "");
+        final List<String> args = new LinkedList<>(Arrays.asList(cleanRawContent.split("[ \t]+")));
+        args.remove(args.get(0));
+        return args;
     }
 
     public String getArgsAsString(final String rawContent,

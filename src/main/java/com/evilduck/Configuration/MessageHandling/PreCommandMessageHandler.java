@@ -16,25 +16,27 @@ public class PreCommandMessageHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreCommandMessageHandler.class);
 
-    private final MessageChannel commandInputChannel;
-    private final CommandFormatter commandFormatter;
     private final MessageFilter messageFilter;
     private final MessageRouter messageRouter;
+    private final CommandFormatter commandFormatter;
+    private final MessageChannel commandInputChannel;
 
     @Autowired
-    public PreCommandMessageHandler(final CommandFormatter commandFormatter,
-                                    final MessageChannel commandInputChannel,
-                                    final MessageFilter messageFilter,
-                                    final MessageRouter messageRouter) {
-        this.commandFormatter = commandFormatter;
-        this.commandInputChannel = commandInputChannel;
+    public PreCommandMessageHandler(final MessageFilter messageFilter,
+                                    final MessageRouter messageRouter,
+                                    final CommandFormatter commandFormatter,
+                                    final MessageChannel commandInputChannel) {
         this.messageFilter = messageFilter;
         this.messageRouter = messageRouter;
+        this.commandFormatter = commandFormatter;
+        this.commandInputChannel = commandInputChannel;
     }
+
 
     @Bean
     public IntegrationFlow generalCommandFlow() {
         return IntegrationFlows.from(commandInputChannel)
+                .transform(commandFormatter)
                 .filter(messageFilter)
                 .wireTap("incomingMessageLoggingChannel")
                 .route(messageRouter)
@@ -50,5 +52,6 @@ public class PreCommandMessageHandler {
         LOGGER.info("Raw Content: {}", message.getContentRaw());
         LOGGER.info(" ========== ========== ========== ========== ==========");
     }
+
 
 }

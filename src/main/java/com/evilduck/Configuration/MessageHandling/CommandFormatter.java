@@ -42,7 +42,7 @@ public class CommandFormatter {
         return commandString.replace("!", "").split(" ").length;
     }
 
-    private boolean isSelfMentioned(final net.dv8tion.jda.core.entities.Message payload) {
+    private boolean isOnlySelfMentioned(final net.dv8tion.jda.core.entities.Message payload) {
         final SelfUser selfUser = jda.getSelfUser();
         final List<Member> mentionedMembers = payload.getMentionedMembers();
 

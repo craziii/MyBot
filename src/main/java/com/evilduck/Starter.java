@@ -1,8 +1,8 @@
 package com.evilduck;
 
-import com.evilduck.Command.Interface.IsACommand;
-import com.evilduck.Entity.CommandDetail;
-import com.evilduck.Repository.CommandDetailRepository;
+import com.evilduck.command.standards.IsACommand;
+import com.evilduck.entity.CommandDetail;
+import com.evilduck.repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
 import org.reflections.Reflections;
@@ -61,7 +61,7 @@ public final class Starter {
 
     private void getCommandClasses() {
         System.out.println("\n ========== ========== ========== ========== ==========\n");
-        LOGGER.info("Loading Command Classes from path: \'{}\'", commandPackagePath);
+        LOGGER.info("Loading command Classes from path: \'{}\'", commandPackagePath);
 
         final Set<Class<?>> commandClasses = new Reflections(commandPackagePath).getTypesAnnotatedWith(IsACommand.class);
         final List<CommandDetail> commandDetailList = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.evilduck;
 
-import com.evilduck.Configuration.MessageHandling.MessageGateway;
+import com.evilduck.configuration.message.handling.MessageGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

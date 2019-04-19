@@ -1,6 +1,6 @@
 package com.evilduck;
 
-import com.evilduck.Configuration.MessageHandling.MessageGateway;
+import com.evilduck.configuration.message.handling.MessageGateway;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;

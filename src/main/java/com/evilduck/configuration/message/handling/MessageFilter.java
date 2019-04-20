@@ -13,7 +13,7 @@ public class MessageFilter {
     public boolean commandFilter(final org.springframework.messaging.Message<Message> message) {
         final net.dv8tion.jda.core.entities.Message payload = message.getPayload();
 
-        return isNotMyself(payload) && isValidCommand(payload);
+        return isNotMyself(payload);
 
     }
 

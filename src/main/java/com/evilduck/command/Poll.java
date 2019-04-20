@@ -3,11 +3,14 @@ package com.evilduck.command;
 import com.evilduck.command.standards.IsACommand;
 import com.evilduck.command.standards.PublicCommand;
 import com.evilduck.repository.PollSessionRepository;
+import com.evilduck.repository.ResponseSessionRepository;
 import com.evilduck.session.PollSession;
+import com.evilduck.session.ResponseSession;
 import com.evilduck.util.CommandHelper;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +20,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static java.lang.Long.parseLong;
 
 @Component
 @IsACommand
@@ -35,11 +42,14 @@ public class Poll implements PublicCommand {
         put(9, ":nine:");
     }};
 
+    private final ResponseSessionRepository responseSessionRepository;
     private final PollSessionRepository pollSessionRepository;
     private final CommandHelper commandHelper;
 
-    public Poll(final PollSessionRepository pollSessionRepository,
+    public Poll(final ResponseSessionRepository responseSessionRepository,
+                final PollSessionRepository pollSessionRepository,
                 final CommandHelper commandHelper) {
+        this.responseSessionRepository = responseSessionRepository;
         this.pollSessionRepository = pollSessionRepository;
         this.commandHelper = commandHelper;
     }
@@ -47,24 +57,32 @@ public class Poll implements PublicCommand {
     @Override
     @ServiceActivator(inputChannel = "pollChannel")
     public void execute(final Message message) {
-        final String requesterId = message.getAuthor().getDiscriminator();
-        final Optional<PollSession> userPoll = pollSessionRepository.findById(requesterId);
+        final String userId = message.getAuthor().getDiscriminator();
+        final Optional<ResponseSession> session = responseSessionRepository.findById(userId);
+        final Optional<PollSession> userPoll = pollSessionRepository.findById(userId);
+
+        if (session.isPresent() && userPoll.isPresent()) startPoll(message, userId, userPoll.get());
+        else if (userPoll.isPresent()) existingPollActions(message, userId);
+        else finalizePollCreation(message, userId);
+    }
+
+    private void existingPollActions(final Message message,
+                                     final String userId) {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
 
         if (args.size() > 0 && args.get(0).toUpperCase().matches("(REMOVE|DELETE|STOP|CANCEL)")) {
-            pollSessionRepository.deleteById(requesterId);
-        } else if (userPoll.isPresent()) {
-            if (args.isEmpty()) {
-                message.getTextChannel()
-                        .sendMessage("You already have a poll, please send `poll cancel` to cancel your poll before starting a new one")
-                        .queue();
-            }
-
+            deletePoll(message, userId);
         } else {
-            final PollSession newPoll = createNewPoll(requesterId);
-            displayPollInTextChannel(message, newPoll);
-            pollSessionRepository.save(newPoll);
+            // Reckon I could format this better, but I don't know how....
+            message.getTextChannel()
+                    .sendMessage("You already have a poll, " +
+                            "please send `poll cancel` to cancel " +
+                            "your poll before starting a new one").queue();
         }
+    }
+
+    private static boolean responseIsValid(final String message) {
+        return message.matches("[0-9]*");
     }
 
     private static void displayPollInTextChannel(final Message message,
@@ -77,14 +95,69 @@ public class Poll implements PublicCommand {
 
         message.getTextChannel().sendMessage(embedBuilder.build()).queue(success -> {
             final int numOfOptions = newPoll.getOptions().size();
-            for (int i = 0; i < numOfOptions; i++) success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
+            for (int i = 0; i < numOfOptions; i++)
+                success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
             newPoll.setMessageId(success.getId());
         });
     }
 
-    private static PollSession createNewPoll(final String requesterId) {
-        final Map<String, Integer> pollOptions = new LinkedHashMap<>(); // TODO: TEST ORDER INERTION SAFETY
+    private PollSession createNewPoll(final String requesterId,
+                                      final Message message) {
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
+        final Map<String, Integer> pollOptions = new LinkedHashMap<>(); // TODO: TEST ORDER INSERTION SAFETY
+        for (int i = 0; i < args.size(); i++) pollOptions.put(args.get(i), i);
+
         return new PollSession(requesterId, pollOptions);
     }
-    
+
+    private void finalizePollCreation(final Message message,
+                                      final String requesterId) {
+        final PollSession newPoll = createNewPoll(requesterId, message);
+        pollSessionRepository.save(newPoll);
+        message.getTextChannel().sendMessage("How many minutes should this poll last?").queue();
+
+        final ResponseSession session = new ResponseSession(requesterId, 0, "poll");
+        responseSessionRepository.save(session);
+    }
+
+    private void startPoll(final Message message,
+                           final String userId,
+                           final PollSession userPoll) {
+        if (responseIsValid(message.getContentRaw())) {
+            displayPollInTextChannel(message, userPoll);
+            final Timer timer = new Timer();
+            timer.schedule(new PollTimer(userId, message.getTextChannel()), parseLong(message.getContentRaw()));
+            responseSessionRepository.deleteById(userId);
+        }
+    }
+
+    private void deletePoll(Message message, String requesterId) {
+        pollSessionRepository.deleteById(requesterId);
+        message.getTextChannel().sendMessage("Your poll has been deleted!").queue();
+    }
+
+    private class PollTimer extends TimerTask {
+
+
+        private final String pollId;
+        private final TextChannel textChannel;
+
+        protected PollTimer(final String pollId,
+                            final TextChannel textChannel) {
+            super();
+            this.pollId = pollId;
+            this.textChannel = textChannel;
+        }
+
+        @Override
+        public void run() {
+            pollSessionRepository.findById(pollId).ifPresent(poll -> {
+                final String messageId = poll.getMessageId();
+                textChannel.sendMessage("Poll finished! Here are the results...").queue();
+                textChannel.deleteMessageById(messageId).reason("Poll has finished").queue();
+                pollSessionRepository.deleteById(pollId);
+            });
+        }
+    }
+
 }

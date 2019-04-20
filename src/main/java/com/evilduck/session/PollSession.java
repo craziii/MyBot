@@ -22,6 +22,10 @@ public class PollSession {
         return memberId;
     }
 
+    public String getMessageId() {
+        return messageId;
+    }
+
     public void setMessageId(final String messageId) {
         this.messageId = messageId;
     }

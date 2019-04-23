@@ -85,8 +85,9 @@ public class Poll implements PublicCommand {
         return message.matches("[0-9]*");
     }
 
-    private static void displayPollInTextChannel(final Message message,
-                                                 final PollSession newPoll) {
+    private void displayPollInTextChannel(final Message message,
+                                          final PollSession newPoll) {
+        final PollSession actualPoll = pollSessionRepository.findById(message.getAuthor().getDiscriminator()).orElse(null);
         final EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(message.getAuthor().getName() + "'s Poll");
         final Map<String, Integer> options = newPoll.getOptions();
         final List<String> optionsKeys = new ArrayList<>(options.keySet());
@@ -94,20 +95,21 @@ public class Poll implements PublicCommand {
         embedBuilder.setDescription("Vote via the reaction icons below");
 
         message.getTextChannel().sendMessage(embedBuilder.build()).queue(success -> {
-            final int numOfOptions = newPoll.getOptions().size();
+            final int numOfOptions = actualPoll.getOptions().size();
             for (int i = 0; i < numOfOptions; i++)
                 success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
-            newPoll.setMessageId(success.getId());
+            actualPoll.setMessageId(success.getId());
+            pollSessionRepository.save(actualPoll);
         });
     }
 
     private PollSession createNewPoll(final String requesterId,
                                       final Message message) {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final Map<String, Integer> pollOptions = new LinkedHashMap<>(); // TODO: TEST ORDER INSERTION SAFETY
+        final Map<String, Integer> pollOptions = new LinkedHashMap<>();
         for (int i = 0; i < args.size(); i++) pollOptions.put(args.get(i), i);
 
-        return new PollSession(requesterId, pollOptions);
+        return new PollSession(requesterId, "0", pollOptions);
     }
 
     private void finalizePollCreation(final Message message,
@@ -131,7 +133,8 @@ public class Poll implements PublicCommand {
         }
     }
 
-    private void deletePoll(Message message, String requesterId) {
+    private void deletePoll(final Message message,
+                            final String requesterId) {
         pollSessionRepository.deleteById(requesterId);
         message.getTextChannel().sendMessage("Your poll has been deleted!").queue();
     }
@@ -142,8 +145,8 @@ public class Poll implements PublicCommand {
         private final String pollId;
         private final TextChannel textChannel;
 
-        protected PollTimer(final String pollId,
-                            final TextChannel textChannel) {
+        PollTimer(final String pollId,
+                  final TextChannel textChannel) {
             super();
             this.pollId = pollId;
             this.textChannel = textChannel;
@@ -153,7 +156,15 @@ public class Poll implements PublicCommand {
         public void run() {
             pollSessionRepository.findById(pollId).ifPresent(poll -> {
                 final String messageId = poll.getMessageId();
-                textChannel.sendMessage("Poll finished! Here are the results...").queue();
+                final Message message = textChannel.getMessageById(messageId).complete();
+                final Map<String, Integer> resultMap = new HashMap<>();
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setTitle("Poll finished! Here are the results...");
+
+                message.getReactions().forEach(messageReaction -> {
+                    builder.addField(messageReaction.getReactionEmote().getName(), String.valueOf(messageReaction.getCount()), false);
+                });
+                textChannel.sendMessage(builder.build()).queue();
                 textChannel.deleteMessageById(messageId).reason("Poll has finished").queue();
                 pollSessionRepository.deleteById(pollId);
             });

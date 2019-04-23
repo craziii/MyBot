@@ -13,8 +13,10 @@ public class PollSession {
 
 
     public PollSession(final String memberId,
+                       final String messageId,
                        final Map<String, Integer> options) {
         this.memberId = memberId;
+        this.messageId = messageId;
         this.options = options;
     }
 

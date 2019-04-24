@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,6 +27,11 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.evilduck.util.TextColorPrefix.GREEN;
+import static com.evilduck.util.TextColorPrefix.ORANGE;
+import static com.evilduck.util.TextColorPrefix.RED;
+import static com.evilduck.util.TextColorPrefix.YELLOW;
+import static com.evilduck.util.TextColorPrefix.getTextInColor;
 import static java.lang.Long.parseLong;
 
 @Component
@@ -34,6 +40,7 @@ public class Poll implements PublicCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Poll.class);
 
+    private static final String CANCEL_REGEX = "(REMOVE|DELETE|STOP|CANCEL)";
     private static final HashMap NUMBER_EMOJIS = new HashMap<Integer, String>() {{
         put(0, ":zero:");
         put(1, ":one:");
@@ -65,10 +72,16 @@ public class Poll implements PublicCommand {
         final String userId = message.getAuthor().getDiscriminator();
         final Optional<ResponseSession> session = responseSessionRepository.findById(userId);
         final Optional<PollSession> userPoll = pollSessionRepository.findById(userId);
-
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
+        final String firstArg = args.size() > 0 ? args.get(0) : "";
+        
         if (session.isPresent() && userPoll.isPresent()) startPoll(message, userId, userPoll.get());
-        else if (userPoll.isPresent()) existingPollActions(message, userId);
-        else finalizePollCreation(message, userId);
+        else if (userPoll.isPresent() || isCancelCommand(firstArg)) existingPollActions(message, userId);
+        else createPoll(message, userId);
+    }
+
+    private static boolean isCancelCommand(final String command) {
+        return command.toUpperCase().matches(CANCEL_REGEX);
     }
 
     private void existingPollActions(final Message message,
@@ -77,7 +90,7 @@ public class Poll implements PublicCommand {
         LOGGER.info("User {} has existing poll, testing for actions...", discriminator);
 
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() > 0 && args.get(0).toUpperCase().matches("(REMOVE|DELETE|STOP|CANCEL)")) {
+        if (args.size() > 0 && isCancelCommand(args.get(0))) {
             deletePoll(message, userId);
             LOGGER.info("User {} has deleted their poll", discriminator);
         } else {
@@ -134,11 +147,13 @@ public class Poll implements PublicCommand {
         return new PollSession(requesterId, "null", pollOptions);
     }
 
-    private void finalizePollCreation(final Message message,
-                                      final String requesterId) {
+    private void createPoll(final Message message,
+                            final String requesterId) {
         final PollSession newPoll = createNewPoll(requesterId, message);
         pollSessionRepository.save(newPoll);
-        message.getTextChannel().sendMessage("How many minutes should this poll last?").queue();
+        message.getTextChannel().sendMessage(
+                getTextInColor(YELLOW, "How many minutes should this poll last?"))
+                .queue();
 
         final ResponseSession session = new ResponseSession(requesterId, 0, "poll");
         responseSessionRepository.save(session);
@@ -152,13 +167,17 @@ public class Poll implements PublicCommand {
             final Timer timer = new Timer();
             timer.schedule(new PollTimer(userId, message.getTextChannel()), parseLong(message.getContentRaw()) * 60000);
             responseSessionRepository.deleteById(userId);
-        }
+        } else message.getTextChannel().sendMessage(getTextInColor(ORANGE, "Invalid input, please specify a number!")).queue();
     }
 
     private void deletePoll(final Message message,
                             final String requesterId) {
+        final Optional<PollSession> poll = pollSessionRepository.findById(requesterId);
         pollSessionRepository.deleteById(requesterId);
-        message.getTextChannel().sendMessage("Your poll has been deleted!").queue();
+        message.getTextChannel().sendMessage(poll.isPresent() ?
+                getTextInColor(GREEN, "Your poll has been deleted!") :
+                getTextInColor(RED, "You don't have a poll!")
+        ).queue();
     }
 
     private class PollTimer extends TimerTask {
@@ -192,6 +211,7 @@ public class Poll implements PublicCommand {
 
                 }
 
+                builder.setColor(Color.CYAN);
                 textChannel.sendMessage(builder.build()).queue();
                 textChannel.deleteMessageById(messageId).reason("Poll has finished").queue();
                 pollSessionRepository.deleteById(pollId);

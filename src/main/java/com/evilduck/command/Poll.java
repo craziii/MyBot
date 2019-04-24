@@ -10,7 +10,10 @@ import com.evilduck.util.CommandHelper;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.entities.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +31,8 @@ import static java.lang.Long.parseLong;
 @Component
 @IsACommand
 public class Poll implements PublicCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Poll.class);
 
     private static final HashMap NUMBER_EMOJIS = new HashMap<Integer, String>() {{
         put(0, ":zero:");
@@ -68,16 +73,20 @@ public class Poll implements PublicCommand {
 
     private void existingPollActions(final Message message,
                                      final String userId) {
-        final List<String> args = commandHelper.getArgs(message.getContentRaw());
+        final String discriminator = message.getAuthor().getDiscriminator();
+        LOGGER.info("User {} has existing poll, testing for actions...", discriminator);
 
+        final List<String> args = commandHelper.getArgs(message.getContentRaw());
         if (args.size() > 0 && args.get(0).toUpperCase().matches("(REMOVE|DELETE|STOP|CANCEL)")) {
             deletePoll(message, userId);
+            LOGGER.info("User {} has deleted their poll", discriminator);
         } else {
             // Reckon I could format this better, but I don't know how....
             message.getTextChannel()
                     .sendMessage("You already have a poll, " +
                             "please send `poll cancel` to cancel " +
                             "your poll before starting a new one").queue();
+            LOGGER.info("User {} has attempted an action whilst already owning a poll, ignoring", discriminator);
         }
     }
 
@@ -87,29 +96,42 @@ public class Poll implements PublicCommand {
 
     private void displayPollInTextChannel(final Message message,
                                           final PollSession newPoll) {
-        final PollSession actualPoll = pollSessionRepository.findById(message.getAuthor().getDiscriminator()).orElse(null);
+        final String discriminator = message.getAuthor().getDiscriminator();
+        LOGGER.info("Displaying poll belonging to user {}", discriminator);
+
+        final PollSession actualPoll = pollSessionRepository.findById(discriminator)
+                .orElse(null);
         final EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(message.getAuthor().getName() + "'s Poll");
         final Map<String, Integer> options = newPoll.getOptions();
         final List<String> optionsKeys = new ArrayList<>(options.keySet());
         for (int i = 0; i < options.size(); i++) embedBuilder.addField(String.valueOf(i), optionsKeys.get(i), true);
         embedBuilder.setDescription("Vote via the reaction icons below");
 
-        message.getTextChannel().sendMessage(embedBuilder.build()).queue(success -> {
-            final int numOfOptions = actualPoll.getOptions().size();
-            for (int i = 0; i < numOfOptions; i++)
-                success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
-            actualPoll.setMessageId(success.getId());
-            pollSessionRepository.save(actualPoll);
-        });
+        message.getTextChannel().sendMessage(embedBuilder.build()).queue(
+                success -> {
+                    for (int i = 0; i < actualPoll.getOptions().size(); i++)
+                        success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
+                    actualPoll.setMessageId(success.getId());
+                    pollSessionRepository.save(actualPoll);
+                    LOGGER.info("Successfully started poll!");
+                },
+                failure -> {
+                    message.getTextChannel().sendMessage("Your poll be fucked my dude ¯\\_(ツ)_/¯\n" +
+                            "I'll go ahead and delete it for you").queue();
+                    responseSessionRepository.deleteById(discriminator);
+                    pollSessionRepository.deleteById(discriminator);
+                    LOGGER.warn("There was a problem starting this poll! All remnants deleted");
+                });
     }
 
     private PollSession createNewPoll(final String requesterId,
                                       final Message message) {
+        LOGGER.info("Creating new poll for user {}", message.getAuthor().getDiscriminator());
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final Map<String, Integer> pollOptions = new LinkedHashMap<>();
         for (int i = 0; i < args.size(); i++) pollOptions.put(args.get(i), i);
 
-        return new PollSession(requesterId, "0", pollOptions);
+        return new PollSession(requesterId, "null", pollOptions);
     }
 
     private void finalizePollCreation(final Message message,
@@ -128,7 +150,7 @@ public class Poll implements PublicCommand {
         if (responseIsValid(message.getContentRaw())) {
             displayPollInTextChannel(message, userPoll);
             final Timer timer = new Timer();
-            timer.schedule(new PollTimer(userId, message.getTextChannel()), parseLong(message.getContentRaw()));
+            timer.schedule(new PollTimer(userId, message.getTextChannel()), parseLong(message.getContentRaw()) * 60000);
             responseSessionRepository.deleteById(userId);
         }
     }
@@ -157,16 +179,24 @@ public class Poll implements PublicCommand {
             pollSessionRepository.findById(pollId).ifPresent(poll -> {
                 final String messageId = poll.getMessageId();
                 final Message message = textChannel.getMessageById(messageId).complete();
-                final Map<String, Integer> resultMap = new HashMap<>();
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.setTitle("Poll finished! Here are the results...");
 
-                message.getReactions().forEach(messageReaction -> {
-                    builder.addField(messageReaction.getReactionEmote().getName(), String.valueOf(messageReaction.getCount()), false);
-                });
+                final List<MessageReaction> reactions = message.getReactions();
+                for (int i = 0; i < reactions.size(); i++) {
+                    final List<String> keys = new ArrayList<>(poll.getOptions().keySet());
+                    builder.addField(
+                            keys.get(i),
+                            String.valueOf(reactions.get(i).getCount() - 1),
+                            true);
+
+                }
+
                 textChannel.sendMessage(builder.build()).queue();
                 textChannel.deleteMessageById(messageId).reason("Poll has finished").queue();
                 pollSessionRepository.deleteById(pollId);
+                LOGGER.info("User {}'s Poll has finished, displayed results and deleted poll.",
+                        message.getAuthor().getDiscriminator());
             });
         }
     }

@@ -14,6 +14,7 @@ import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,7 @@ public class Poll implements PublicCommand {
     private final PollSessionRepository pollSessionRepository;
     private final CommandHelper commandHelper;
 
+    @Autowired
     public Poll(final ResponseSessionRepository responseSessionRepository,
                 final PollSessionRepository pollSessionRepository,
                 final CommandHelper commandHelper) {
@@ -74,7 +76,7 @@ public class Poll implements PublicCommand {
         final Optional<PollSession> userPoll = pollSessionRepository.findById(userId);
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final String firstArg = args.size() > 0 ? args.get(0) : "";
-        
+
         if (session.isPresent() && userPoll.isPresent()) startPoll(message, userId, userPoll.get());
         else if (userPoll.isPresent() || isCancelCommand(firstArg)) existingPollActions(message, userId);
         else createPoll(message, userId);
@@ -121,20 +123,25 @@ public class Poll implements PublicCommand {
         embedBuilder.setDescription("Vote via the reaction icons below");
 
         message.getTextChannel().sendMessage(embedBuilder.build()).queue(
-                success -> {
-                    for (int i = 0; i < actualPoll.getOptions().size(); i++)
-                        success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
-                    actualPoll.setMessageId(success.getId());
-                    pollSessionRepository.save(actualPoll);
-                    LOGGER.info("Successfully started poll!");
-                },
-                failure -> {
-                    message.getTextChannel().sendMessage("Your poll be fucked my dude ¯\\_(ツ)_/¯\n" +
-                            "I'll go ahead and delete it for you").queue();
-                    responseSessionRepository.deleteById(discriminator);
-                    pollSessionRepository.deleteById(discriminator);
-                    LOGGER.warn("There was a problem starting this poll! All remnants deleted");
-                });
+                success -> pollShowSuccess(actualPoll, success),
+                failure -> pollShowFailure(message, discriminator)
+        );
+    }
+
+    private void pollShowSuccess(PollSession actualPoll, Message success) {
+        for (int i = 0; i < actualPoll.getOptions().size(); i++)
+            success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
+        actualPoll.setMessageId(success.getId());
+        pollSessionRepository.save(actualPoll);
+        LOGGER.info("Successfully started poll!");
+    }
+
+    private void pollShowFailure(Message message, String discriminator) {
+        message.getTextChannel().sendMessage("Your poll be fucked my dude ¯\\_(ツ)_/¯\n" +
+                "I'll go ahead and delete it for you").queue();
+        responseSessionRepository.deleteById(discriminator);
+        pollSessionRepository.deleteById(discriminator);
+        LOGGER.warn("There was a problem starting this poll! All remnants deleted");
     }
 
     private PollSession createNewPoll(final String requesterId,
@@ -181,7 +188,6 @@ public class Poll implements PublicCommand {
     }
 
     private class PollTimer extends TimerTask {
-
 
         private final String pollId;
         private final TextChannel textChannel;

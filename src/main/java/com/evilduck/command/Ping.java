@@ -11,13 +11,13 @@ import org.slf4j.Logger;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
-import java.awt.Color;
+import java.awt.*;
 
 import static java.lang.String.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
-@IsACommand(aliases = {"lag"})
+@IsACommand(aliases = {"p", "lag"})
 public class Ping implements PublicCommand, UnstableCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);

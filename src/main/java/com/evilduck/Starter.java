@@ -56,10 +56,10 @@ public final class Starter {
             outputListString.append(format("%s\n", defaultProfile));
         LOGGER.info("Environments:\n{}", outputListString.toString());
 
-        getCommandClasses();
+        saveCommandDetailsFromClasses();
     }
 
-    private void getCommandClasses() {
+    private void saveCommandDetailsFromClasses() {
         System.out.println("\n ========== ========== ========== ========== ==========\n");
         LOGGER.info("Loading command Classes from path: \'{}\'", commandPackagePath);
 

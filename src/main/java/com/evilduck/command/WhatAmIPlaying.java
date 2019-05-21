@@ -13,11 +13,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static net.dv8tion.jda.core.entities.Game.GameType.*;
+import static net.dv8tion.jda.core.entities.Game.GameType.DEFAULT;
+import static net.dv8tion.jda.core.entities.Game.GameType.LISTENING;
+import static net.dv8tion.jda.core.entities.Game.GameType.STREAMING;
+import static net.dv8tion.jda.core.entities.Game.GameType.WATCHING;
 
 //  TODO: WORK IN PROGRESS!
 @Component
-@IsACommand
+@IsACommand(aliases = {"waip"})
 public class WhatAmIPlaying implements PrivateCommand {
 
     private final CommandHelper commandHelper;

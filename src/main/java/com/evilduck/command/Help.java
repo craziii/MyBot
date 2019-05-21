@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@IsACommand(description = "Displays information about every command this bot has", aliases = "Use \'!h\' or \'!help\' to use")
+@IsACommand(description = "Displays information about every command this bot has", aliases = "h")
 public class Help implements PublicCommand {
 
     private final CommandDetailRepository commandDetailRepository;

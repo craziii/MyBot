@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 import static java.util.Arrays.asList;
-import static net.dv8tion.jda.core.Permission.*;
+import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
+import static net.dv8tion.jda.core.Permission.MANAGE_ROLES;
+import static net.dv8tion.jda.core.Permission.MANAGE_SERVER;
 import static org.apache.commons.lang3.StringUtils.isAlphanumeric;
 
 @Component
@@ -60,8 +62,8 @@ public class BannedPhrase implements PrivateCommand, UnstableCommand {
                 .getTextChannel();
         if (hasPermissionToRun(member)) {
             final String contentRaw = message.getContentRaw();
-            final String action = commandHelper.getArgs(contentRaw).get(1);
-            final String proposedBannedPhrase = commandHelper.getArgsAsString(contentRaw, 2)
+            final String action = commandHelper.getArgs(contentRaw).get(0);
+            final String proposedBannedPhrase = commandHelper.getArgsAsString(contentRaw, 1)
                     .trim()
                     .toLowerCase();
 

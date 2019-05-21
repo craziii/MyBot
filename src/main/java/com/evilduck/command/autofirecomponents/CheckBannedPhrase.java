@@ -34,13 +34,7 @@ public class CheckBannedPhrase implements GenericCommand {
     @Override
     @ServiceActivator(inputChannel = "autoFireCommandChannel")
     public void execute(final Message message) {
-        LOGGER.info("Checking message for banned phrases...");
-        final String rawMessage = commandHelper.getArgsAsString(message.getContentRaw(), 0);
-        final List<String> matches = commandHelper.getArgs(message.getContentRaw()).stream()
-                .filter(arg -> bannedPhraseRepository.findById(arg.toLowerCase()).isPresent())
-                .collect(toList());
-        if (matches.size() > 0 || bannedPhraseRepository.findById(rawMessage).isPresent()) {
-            LOGGER.info("Message matched {} banned phrases", matches.size());
+        if (matchesBannedPhrase(message.getContentRaw())) {
             message.getTextChannel()
                     .sendMessage("Banned Phrase said my user: " +
                             message.getAuthor().getAsMention())
@@ -48,6 +42,15 @@ public class CheckBannedPhrase implements GenericCommand {
         } else {
             LOGGER.info("No Banned Phrases found in message");
         }
+    }
+
+    private boolean matchesBannedPhrase(final String rawContent) {
+        LOGGER.info("Checking message for banned phrases...");
+        final List<String> matches = commandHelper.getArgs(rawContent).stream()
+                .filter(arg -> bannedPhraseRepository.findById(arg.toLowerCase()).isPresent())
+                .collect(toList());
+        LOGGER.info("Message matched {} banned phrases", matches.size());
+        return (matches.size() > 0 || bannedPhraseRepository.findById(rawContent).isPresent());
     }
 
 }

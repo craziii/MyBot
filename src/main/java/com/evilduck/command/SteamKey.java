@@ -19,6 +19,8 @@ import static org.joda.time.DateTime.now;
 @IsACommand
 public class SteamKey implements PublicCommand {
 
+    private static final int COUNTDOWN_DELAY = 10;
+
     private final CommandHelper commandHelper;
 
     public SteamKey(final CommandHelper commandHelper) {
@@ -39,19 +41,17 @@ public class SteamKey implements PublicCommand {
         final String steamKey = args.get(0);
         final int expiry = args.size() > 1 ? parseInt(args.get(1)) : -1;
 
-
         originChannel.deleteMessageById(message.getId()).queue();
-        final String messageId = originChannel.sendMessage("Dropping steam key in: " + 5 + "s...").complete().getId();
+        final String messageId = originChannel.sendMessage("@here Dropping steam key in: " + 10 + "s...").complete().getId();
 
         final Timer timer = new Timer();
 
-        for (int i = 5; i >= 0; i--)
+        for (int i = COUNTDOWN_DELAY; i >= 0; i--)
             timer.schedule(new SteamKeyCountDown(originChannel, messageId, i, steamKey),
-                    now().plusSeconds(5 - i).toDate());
+                    now().plusSeconds(COUNTDOWN_DELAY - i).toDate());
 
         if (expiry > 0)
-            timer.schedule(new SteamKeyDelete(originChannel, messageId),
-                    now().plusSeconds(expiry + 5).toDate());
+            timer.schedule(new SteamKeyDelete(originChannel, messageId), now().plusSeconds(expiry + COUNTDOWN_DELAY).toDate());
 
     }
 
@@ -76,7 +76,7 @@ public class SteamKey implements PublicCommand {
         public void run() {
             messageChannel.getMessageById(messageId)
                     .complete()
-                    .editMessage(countDownTimer == 0 ? "Here is the steam key!\n```" + key + "```\n" : "Dropping steam key in: " + countDownTimer + "s...")
+                    .editMessage(countDownTimer == 0 ? "Here is the steam key!\n```" + key + "```\n" : "@here Dropping steam key in: " + countDownTimer + "s...")
                     .queue();
         }
     }

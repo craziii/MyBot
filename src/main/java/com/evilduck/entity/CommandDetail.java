@@ -80,7 +80,7 @@ public class CommandDetail {
     }
 
     public boolean commandStringMatches(final String commandString) {
-        return commandString.matches(fullCommand) || aliases.stream().anyMatch(alias -> alias.matches(commandString));
+        return commandString.toUpperCase().matches(fullCommand.toUpperCase()) || aliases.stream().anyMatch(alias -> alias.matches(commandString));
     }
 
     @Override

@@ -1,23 +1,38 @@
 package com.evilduck.util;
 
+import com.evilduck.entity.TimedAction;
+
+import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Function;
+
+import static org.joda.time.DateTime.now;
 
 // TODO: Test this shit, trying to have a generic callback, code reduction, yadda yadda, blah blah blah...
 public class CallbackTimer<T> extends TimerTask {
 
-    private final Function<T, ?> function;
+    private final Timer timer;
+    private final TimedAction<T> timedAction;
     private final T o;
 
-    public CallbackTimer(final Function function,
+    public CallbackTimer(final Timer timer,
+                         final TimedAction<T> timedAction,
                          final T o) {
-        this.function = function;
+        this.timer = timer;
+        this.timedAction = timedAction;
         this.o = o;
+    }
+
+    private CallbackTimer copy() {
+        return new CallbackTimer(timer, timedAction, o);
+    }
+
+    public void schedule(final int seconds) {
+        timer.schedule(copy(), now().plusSeconds(seconds).toDate());
     }
 
     @Override
     public void run() {
-        function.apply(o);
+        timedAction.apply(o);
     }
 
 }

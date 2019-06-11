@@ -1,5 +1,8 @@
 package com.evilduck.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.CaseFormat;
 import org.springframework.data.annotation.Id;
 
@@ -8,6 +11,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
+@JsonSerialize
 public class CommandDetail {
 
     @Id
@@ -22,7 +26,7 @@ public class CommandDetail {
     public CommandDetail(final String fullCommand) {
         this.fullCommand = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, fullCommand);
         aliases = new ArrayList<>();
-        aliases.add(generateCamelCaseAlias(fullCommand));
+//        aliases.add(generateCamelCaseAlias(fullCommand));
     }
 
     public String getFullCommand() {
@@ -86,14 +90,14 @@ public class CommandDetail {
 
     @Override
     public String toString() {
-        return "CommandDetail{" +
-                "id='" + id + '\'' +
-                ", fullCommand='" + fullCommand + '\'' +
-                ", camelCaseAlias='" + camelCaseAlias + '\'' +
-                ", description='" + description + '\'' +
-                ", aliases=" + aliases +
-                ", aliases='" + tutorial + '\'' +
-                '}';
+        final ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return "CommandDetail: " + objectMapper.writeValueAsString(this);
+        } catch (final JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "Command Serialize Issue";
     }
+
 
 }

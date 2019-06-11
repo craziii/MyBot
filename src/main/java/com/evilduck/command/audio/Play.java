@@ -3,7 +3,6 @@ package com.evilduck.command.audio;
 import com.evilduck.command.standards.GenericCommand;
 import com.evilduck.command.standards.IsACommand;
 import com.evilduck.command.standards.UnstableCommand;
-import com.evilduck.configuration.AudioResultHandler;
 import com.evilduck.configuration.TrackScheduler;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
@@ -45,6 +44,8 @@ public class Play implements GenericCommand, UnstableCommand {
         this.trackScheduler = trackScheduler;
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
+
+        audioPlayer.addListener(trackScheduler);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class Play implements GenericCommand, UnstableCommand {
     public void execute(final Message message) throws IOException {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() < 2) {
+        if (args.size() < 1) {
             originChannel.sendMessage("You must specify a link to play!").queue();
             return;
         }
@@ -74,18 +75,17 @@ public class Play implements GenericCommand, UnstableCommand {
             originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
             return;
         }
-
-        startPlayFromLink(message, args.get(0), voiceChannelTry.get());
+        startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
     }
 
     private void startPlayFromLink(final Message message,
-                                   final String url,
+                                   final String search,
                                    final VoiceChannel voiceChannelTry) {
-        audioPlayerManager.loadItem(url, new AudioResultHandler(
-                message,
-                voiceChannelTry,
-                audioPlayer,
-                audioPlayerSupport));
+        final boolean searchIsUri = search.matches(".*youtube\\.com/.*");
+        final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
+
+        audioPlayerSupport.startPlayFromLink(message, searchPrefix.concat(search), voiceChannelTry);
+        
     }
 
     private static Try<VoiceChannel> getVoiceChannelByUserId(final String id,

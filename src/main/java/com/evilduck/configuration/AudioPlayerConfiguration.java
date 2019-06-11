@@ -12,7 +12,7 @@ public class AudioPlayerConfiguration {
 
     @Bean
     public AudioPlayerManager audioPlayerManager() {
-        final DefaultAudioPlayerManager defaultAudioPlayerManager = new DefaultAudioPlayerManager();
+        final AudioPlayerManager defaultAudioPlayerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(defaultAudioPlayerManager);
         return defaultAudioPlayerManager;
     }

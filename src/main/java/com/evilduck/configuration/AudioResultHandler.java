@@ -34,9 +34,7 @@ public class AudioResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(final AudioTrack track) {
         LOGGER.info("Loaded Track: {}", track.getIdentifier());
-        final AudioManager audioManager = message.getTextChannel()
-                .getGuild()
-                .getAudioManager();
+        final AudioManager audioManager = message.getTextChannel().getGuild().getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
         audioPlayerSupport.play(track, message.getTextChannel());
@@ -45,12 +43,15 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(final AudioPlaylist playlist) {
-
+        LOGGER.info("Loaded Playlist {}, containing {} tracks",
+                playlist.isSearchResult() ? "Search" : playlist.getName(), playlist.getTracks().size());
+        trackLoaded(playlist.getTracks().get(0));
+        // TODO: Get playlists working properly! Not search results though!
     }
 
     @Override
     public void noMatches() {
-
+        final String stuff = "stuff";
     }
 
     @Override

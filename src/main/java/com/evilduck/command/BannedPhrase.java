@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 import static java.util.Arrays.asList;
 import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 import static net.dv8tion.jda.core.Permission.MANAGE_ROLES;
@@ -56,7 +54,7 @@ public class BannedPhrase implements PrivateCommand, UnstableCommand {
 
     @Override
     @ServiceActivator(inputChannel = "bannedPhraseChannel")
-    public void execute(final Message message) throws IOException {
+    public void execute(final Message message) {
         final Member member = message.getMember();
         final TextChannel textChannel = message
                 .getTextChannel();
@@ -79,10 +77,10 @@ public class BannedPhrase implements PrivateCommand, UnstableCommand {
 
     private void performDatabaseAction(TextChannel textChannel, String action, String proposedBannedPhrase) {
         if (action.toUpperCase().matches("(I(NSERT)?)|(S(AVE)?)")) {
-            bannedPhraseRepository.save(new BannedPhraseEntity(proposedBannedPhrase));
+            bannedPhraseRepository.save(new BannedPhraseEntity("test", proposedBannedPhrase));
             textChannel.sendMessage("Banned phrase saved").queue();
         } else if (action.toUpperCase().matches("(D(ELETE)?)|(R(EMOVE)?)")) {
-            bannedPhraseRepository.delete(new BannedPhraseEntity(proposedBannedPhrase));
+            bannedPhraseRepository.delete(new BannedPhraseEntity("test", proposedBannedPhrase));
             textChannel.sendMessage("Banned phrase removed").queue();
         }
     }

@@ -36,7 +36,7 @@ public class CheckBannedPhrase implements GenericCommand {
     public void execute(final Message message) {
         if (matchesBannedPhrase(message.getContentRaw())) {
             message.getTextChannel()
-                    .sendMessage("Banned Phrase said my user: " +
+                    .sendMessage("Banned Phrase said by user: " +
                             message.getAuthor().getAsMention())
                     .queue();
         } else {
@@ -46,8 +46,8 @@ public class CheckBannedPhrase implements GenericCommand {
 
     private boolean matchesBannedPhrase(final String rawContent) {
         LOGGER.info("Checking message for banned phrases...");
-        final List<String> matches = commandHelper.getArgs(rawContent).stream()
-                .filter(arg -> bannedPhraseRepository.findById(arg.toLowerCase()).isPresent())
+        final List<String> matches = commandHelper.getArgs(rawContent, true).stream()
+                .filter(arg -> bannedPhraseRepository.findAll().stream().anyMatch(bannedPhraseEntity -> arg.toLowerCase().contains(bannedPhraseEntity.getId())))
                 .collect(toList());
         LOGGER.info("Message matched {} banned phrases", matches.size());
         return (matches.size() > 0 || bannedPhraseRepository.findById(rawContent).isPresent());

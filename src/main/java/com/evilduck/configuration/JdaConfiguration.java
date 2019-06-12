@@ -20,12 +20,12 @@ public class JdaConfiguration {
 
     @Bean
     public JDA jda(final MessageListener messageListener,
-                   @Value("${server.bot.token}") final String token) {
+                   @Value("${server.bot.token}") final String token) throws InterruptedException {
         try {
             return new JDABuilder(BOT)
                     .setToken(token)
                     .addEventListener(messageListener)
-                    .buildAsync();
+                    .buildBlocking();
         } catch (final LoginException e) {
             LOGGER.error("Unable to build JDABuilder, cause,\n{}",
                     e.getMessage());

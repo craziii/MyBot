@@ -6,9 +6,12 @@ public class BannedPhraseEntity {
 
     @Id
     private String id;
+    private String phrase;
 
-    public BannedPhraseEntity(final String id) {
+    public BannedPhraseEntity(final String id,
+                              final String phrase) {
         this.id = id;
+        this.phrase = phrase;
     }
 
     public String getId() {
@@ -19,5 +22,11 @@ public class BannedPhraseEntity {
         this.id = id;
     }
 
+    public String getPhrase() {
+        return phrase;
+    }
 
+    public void setPhrase(String phrase) {
+        this.phrase = phrase;
+    }
 }

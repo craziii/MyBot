@@ -29,9 +29,14 @@ public class CommandHelper {
     }
 
     public List<String> getArgs(final String rawContent) {
+        return getArgs(rawContent, false);
+    }
+
+    public List<String> getArgs(final String rawContent,
+                                final boolean isRaw) {
         final String cleanRawContent = rawContent.replaceAll("\\P{Print}", "");
         final List<String> args = new LinkedList<>(Arrays.asList(cleanRawContent.split("[ \t]+")));
-        args.remove(args.get(0));
+        if (!isRaw) args.remove(args.get(0));
         return args;
     }
 

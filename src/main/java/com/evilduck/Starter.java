@@ -1,10 +1,15 @@
 package com.evilduck;
 
 import com.evilduck.command.standards.IsACommand;
+import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.entity.CommandDetail;
+import com.evilduck.repository.BannedPhraseRepository;
 import com.evilduck.repository.CommandDetailRepository;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,20 +38,25 @@ public final class Starter {
 
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
+    private final BannedPhraseRepository bannedPhraseRepository;
     private final String commandPackagePath;
+    private final JDA jda;
 
     @Autowired
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
-                   @Value("${command.package}") final String commandPackagePath) {
+                   final BannedPhraseRepository bannedPhraseRepository,
+                   @Value("${command.package}") final String commandPackagePath,
+                   final JDA jda) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
+        this.bannedPhraseRepository = bannedPhraseRepository;
         this.commandPackagePath = commandPackagePath;
+        this.jda = jda;
     }
 
     @PostConstruct
-    public void init() throws IOException {
-
+    public void init() {
         LOGGER.info("JeffBot is starting...");
         System.out.println(loadStartupText());
 
@@ -57,6 +66,7 @@ public final class Starter {
         LOGGER.info("Environments:\n{}", outputListString.toString());
 
         saveCommandDetailsFromClasses();
+        saveBannedPhrases();
     }
 
     private void saveCommandDetailsFromClasses() {
@@ -69,15 +79,7 @@ public final class Starter {
         commandClasses.forEach(commandClass -> {
             final Optional<IsACommand> isACommand = ofNullable(commandClass.getAnnotation(IsACommand.class));
             if (isACommand.isPresent()) {
-                final String commandName = commandClass.getSimpleName();
-                final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
-
-                commandDetail.setAliases(asList(isACommand.get().aliases()));
-                commandDetail.setDescription(isACommand.get().description());
-
-                LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
-                        commandDetail.getFullCommand(),
-                        commandDetail.getAliases());
+                final CommandDetail commandDetail = buildCommandDetail(commandClass, isACommand.get());
                 commandDetailList.add(commandDetail);
             }
         });
@@ -87,6 +89,32 @@ public final class Starter {
         commandDetailRepository.saveAll(commandDetailList);
 
         System.out.println("\n ========== ========== ========== ========== ==========\n");
+    }
+
+    private void saveBannedPhrases() {
+        final Optional<TextChannel> rulesChannel = jda.getTextChannels().stream().filter(textChannel -> textChannel.getName().toLowerCase().matches("rules")).findFirst();
+        if (rulesChannel.isPresent()) {
+            final List<Message> messages = rulesChannel.map(textChannel -> textChannel.getPinnedMessages().complete()).get();
+            final Optional<Message> bannedPhraseMessage = messages.stream().filter(message -> message.getContentRaw().toLowerCase().contains(":")).findFirst();
+            if (bannedPhraseMessage.isPresent()) {
+                final String bannedPhraseList = bannedPhraseMessage.map(message -> message.getContentRaw().replace("```", "").substring(message.getContentRaw().indexOf(":") + 3)).get();
+                final List<String> split = asList(bannedPhraseList.split("\n"));
+                split.forEach(bannedPhrase -> bannedPhraseRepository.save(new BannedPhraseEntity(bannedPhrase.toLowerCase(), "testGuild")));
+            }
+        }
+    }
+
+    private static CommandDetail buildCommandDetail(final Class<?> commandClass,
+                                                    final IsACommand isACommand) {
+        final String commandName = commandClass.getSimpleName();
+        final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
+        commandDetail.setAliases(asList(isACommand.aliases()));
+        commandDetail.setDescription(isACommand.description());
+
+        LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
+                commandDetail.getFullCommand(),
+                commandDetail.getAliases());
+        return commandDetail;
     }
 
     private static String loadStartupText() {

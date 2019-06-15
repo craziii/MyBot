@@ -1,4 +1,4 @@
-package com.evilduck.configuration;
+package com.evilduck.configuration.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;

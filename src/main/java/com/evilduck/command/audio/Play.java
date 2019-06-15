@@ -3,7 +3,7 @@ package com.evilduck.command.audio;
 import com.evilduck.command.standards.GenericCommand;
 import com.evilduck.command.standards.IsACommand;
 import com.evilduck.command.standards.UnstableCommand;
-import com.evilduck.configuration.TrackScheduler;
+import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 
 @Component
@@ -60,22 +59,25 @@ public class Play implements GenericCommand, UnstableCommand {
 
     @Override
     @ServiceActivator(inputChannel = "playChannel")
-    public void execute(final Message message) throws IOException {
+    public void execute(final Message message) {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (args.size() < 1) {
+        if (audioPlayer.isPaused()) {
+            audioPlayer.setPaused(false);
+            originChannel.sendMessage("Resuming: " + audioPlayer.getPlayingTrack().getInfo().title).queue();
+        } else if (args.isEmpty()) {
             originChannel.sendMessage("You must specify a link to play!").queue();
-            return;
-        }
+        } else {
 
-        final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
-                message.getAuthor().getId(),
-                message.getGuild().getVoiceChannels());
-        if (voiceChannelTry.isFailure()) {
-            originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
-            return;
+            final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
+                    message.getAuthor().getId(),
+                    message.getGuild().getVoiceChannels());
+            if (voiceChannelTry.isFailure()) {
+                originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
+                return;
+            }
+            startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
         }
-        startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
     }
 
     private void startPlayFromLink(final Message message,
@@ -85,7 +87,7 @@ public class Play implements GenericCommand, UnstableCommand {
         final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
 
         audioPlayerSupport.startPlayFromLink(message, searchPrefix.concat(search), voiceChannelTry);
-        
+
     }
 
     private static Try<VoiceChannel> getVoiceChannelByUserId(final String id,

@@ -3,7 +3,7 @@ package com.evilduck.command.audio;
 import com.evilduck.command.standards.IsACommand;
 import com.evilduck.command.standards.PrivateCommand;
 import com.evilduck.command.standards.UnstableCommand;
-import com.evilduck.configuration.TrackScheduler;
+import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;

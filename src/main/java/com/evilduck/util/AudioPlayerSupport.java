@@ -1,7 +1,7 @@
 package com.evilduck.util;
 
-import com.evilduck.configuration.AudioResultHandler;
-import com.evilduck.configuration.TrackScheduler;
+import com.evilduck.configuration.audio.AudioResultHandler;
+import com.evilduck.configuration.audio.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;

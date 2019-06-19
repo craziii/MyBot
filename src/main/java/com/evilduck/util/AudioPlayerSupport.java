@@ -47,7 +47,7 @@ public class AudioPlayerSupport {
     public void next(final TextChannel textChannel) {
         audioPlayer.stopTrack();
         final AudioTrack nextTrack = trackScheduler.getNextTrack();
-        audioPlayer.startTrack(nextTrack, true);
+        audioPlayer.playTrack(nextTrack);
         displayPlayingTrack(nextTrack, textChannel);
     }
 

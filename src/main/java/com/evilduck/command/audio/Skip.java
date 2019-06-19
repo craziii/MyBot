@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@IsACommand(aliases = {"next"})
+@IsACommand(aliases = {"s", "next"})
 public class Skip implements PrivateCommand {
 
     private final TrackScheduler trackScheduler;

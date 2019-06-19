@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('test') {
+            steps {
+                sh './gradlew test'
+            }
+
+        }
+        stage('clean') {
+            steps {
+                sh './gradlew clean'
+            }
+        }
+        stage('build') {
+            steps {
+                sh './gradlew build'
+            }
+        }
+        stage('start') {
+            steps {
+                sh 'java -jar build/libs/evilduck-0.0.1-SNAPSHOT.jar'
+            }
+        }
+    }
+}

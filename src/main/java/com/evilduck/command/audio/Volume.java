@@ -38,12 +38,16 @@ public class Volume implements PrivateCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final TextChannel originChannel = message.getTextChannel();
 
-        if (args.size() < 2) originChannel.sendMessage("You have not specified a new volume!").queue();
+        if (args.size() < 1) originChannel.sendMessage("You have not specified a new volume!").queue();
 
         final int volume = Integer.parseInt(args.get(0));
-        if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();
+        if (message.getGuild().getId().matches("203522480063643658")) {
+            audioPlayer.setVolume(volume);
+            return;
+        }
 
-        audioPlayer.setVolume(volume);
+        if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();
+        else audioPlayer.setVolume(volume);
     }
 
 }

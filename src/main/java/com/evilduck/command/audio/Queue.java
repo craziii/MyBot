@@ -39,7 +39,10 @@ public class Queue implements PublicCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
 
         if (!args.isEmpty()) {
-            if (args.get(0).toLowerCase().matches("clear|empty|dump")) clearQueue();
+            if (args.get(0).toLowerCase().matches("clear|empty|dump")) {
+                message.getTextChannel().sendMessage("Queue has been cleared!").queue();
+                clearQueue();
+            }
         } else {
             final LinkedBlockingQueue<AudioTrack> queue = trackScheduler.getQueue();
             final TextChannel textChannel = message.getTextChannel();

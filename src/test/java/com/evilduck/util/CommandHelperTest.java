@@ -36,7 +36,7 @@ public class CommandHelperTest {
     @Test
     public void getArgs() {
         final List<String> args = commandHelper.getArgs("!command arg1 arg2");
-        assertThat(args, hasItems("!command", "arg1", "arg2"));
+        assertThat(args, hasItems("arg1", "arg2"));
     }
 
     @Test

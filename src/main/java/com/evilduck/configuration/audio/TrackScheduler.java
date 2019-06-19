@@ -51,8 +51,7 @@ public class TrackScheduler extends AudioEventAdapter {
                            final AudioTrack track,
                            final AudioTrackEndReason endReason) {
         LOGGER.info("Track has just finished!, Trying next track");
-        audioPlayer.stopTrack();
-        audioPlayer.startTrack(queue.poll(), false);
+        audioPlayer.playTrack(queue.poll());
     }
 
     public void offer(final AudioTrack audioTrack) {

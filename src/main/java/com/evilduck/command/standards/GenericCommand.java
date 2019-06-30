@@ -6,6 +6,6 @@ import java.io.IOException;
 
 public interface GenericCommand {
 
-    void execute(final Message message) throws IOException;
+    void execute(Message message) throws IOException;
 
 }

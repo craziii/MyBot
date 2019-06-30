@@ -55,10 +55,9 @@ public class BannedPhrase implements PrivateCommand, UnstableCommand {
     @Override
     @ServiceActivator(inputChannel = "bannedPhraseChannel")
     public void execute(final Message message) {
-        final Member member = message.getMember();
         final TextChannel textChannel = message
                 .getTextChannel();
-        if (hasPermissionToRun(member)) {
+        if (hasPermissionToRun(message.getMember())) {
             final String contentRaw = message.getContentRaw();
             final String action = commandHelper.getArgs(contentRaw).get(0);
             final String proposedBannedPhrase = commandHelper.getArgsAsString(contentRaw, 1)
@@ -75,7 +74,9 @@ public class BannedPhrase implements PrivateCommand, UnstableCommand {
         }
     }
 
-    private void performDatabaseAction(TextChannel textChannel, String action, String proposedBannedPhrase) {
+    private void performDatabaseAction(final TextChannel textChannel,
+                                       final String action,
+                                       final String proposedBannedPhrase) {
         if (action.toUpperCase().matches("(I(NSERT)?)|(S(AVE)?)")) {
             bannedPhraseRepository.save(new BannedPhraseEntity("test", proposedBannedPhrase));
             textChannel.sendMessage("Banned phrase saved").queue();

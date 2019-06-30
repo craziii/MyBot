@@ -3,46 +3,58 @@ package com.evilduck.configuration.audio;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.player.event.PlayerPauseEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.PlayerResumeEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-@Component
 public class TrackScheduler extends AudioEventAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
-    private final AudioPlayer audioPlayer;
     private final LinkedBlockingQueue<AudioTrack> queue;
 
     @Autowired
-    public TrackScheduler(final AudioPlayer audioPlayer) {
-        this.audioPlayer = audioPlayer;
-        audioPlayer.addListener(this);
+    public TrackScheduler() {
         this.queue = new LinkedBlockingQueue<>();
     }
 
     @Override
     public void onEvent(final AudioEvent event) {
+        final AudioPlayer player = event.player;
+        if (event instanceof TrackStartEvent) {
+            onTrackStart(player, ((TrackStartEvent) event).track);
+        } else if (event instanceof TrackEndEvent) {
+            onTrackEnd(player, ((TrackEndEvent) event).track, ((TrackEndEvent) event).endReason);
+        } else if (event instanceof PlayerResumeEvent) {
+            onPlayerResume(player);
+        } else if (event instanceof PlayerPauseEvent) {
+            onPlayerPause(player);
+        } else {
+            LOGGER.error("An undefined AudioEvent has occurred! {}", event.toString());
+        }
 
     }
 
     @Override
-    public void onPlayerPause(AudioPlayer player) {
+    public void onPlayerPause(final AudioPlayer player) {
         super.onPlayerPause(player);
     }
 
     @Override
-    public void onPlayerResume(AudioPlayer player) {
+    public void onPlayerResume(final AudioPlayer player) {
         super.onPlayerResume(player);
     }
 
     @Override
-    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+    public void onTrackStart(final AudioPlayer player,
+                             final AudioTrack track) {
         super.onTrackStart(player, track);
     }
 
@@ -51,7 +63,8 @@ public class TrackScheduler extends AudioEventAdapter {
                            final AudioTrack track,
                            final AudioTrackEndReason endReason) {
         LOGGER.info("Track has just finished!, Trying next track");
-        audioPlayer.playTrack(queue.poll());
+        player.startTrack(getNextTrack(), true);
+        super.onTrackEnd(player, track, endReason);
     }
 
     public void offer(final AudioTrack audioTrack) {

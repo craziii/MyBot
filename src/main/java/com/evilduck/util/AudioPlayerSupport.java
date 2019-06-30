@@ -57,6 +57,7 @@ public class AudioPlayerSupport {
         displayPlayingTrack(audioTrack, textChannel);
     }
 
+
     private static void displayPlayingTrack(final AudioTrack audioTrack,
                                             final TextChannel textChannel) {
         final long duration = audioTrack.getDuration();

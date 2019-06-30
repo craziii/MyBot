@@ -3,6 +3,7 @@ package com.evilduck.configuration.audio;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +24,13 @@ public class AudioPlayerConfiguration {
         player.setVolume(25);
         return player;
     }
+
+    @Bean
+    public AudioEventAdapter audioEventAdapter(final AudioPlayer audioPlayer) {
+        final AudioEventAdapter audioEventAdapter = new TrackScheduler();
+        audioPlayer.addListener(audioEventAdapter);
+        return audioEventAdapter;
+    }
+
 
 }

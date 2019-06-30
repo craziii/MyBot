@@ -17,6 +17,8 @@ import java.util.List;
 @IsACommand(aliases = "v")
 public class Volume implements PrivateCommand {
 
+    private static final String DEANS_SERVER = "203522480063643658";
+
     private final AudioPlayer audioPlayer;
     private final CommandHelper commandHelper;
 
@@ -38,15 +40,15 @@ public class Volume implements PrivateCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final TextChannel originChannel = message.getTextChannel();
 
-        if (args.size() < 1) originChannel.sendMessage("You have not specified a new volume!").queue();
-
-        final int volume = Integer.parseInt(args.get(0));
-        if (message.getGuild().getId().matches("203522480063643658")) {
-            audioPlayer.setVolume(volume);
+        if (args.isEmpty()) {
+            originChannel.sendMessage("You have not specified a new volume!").queue();
             return;
         }
 
-        if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();
+        final int volume = Integer.parseInt(args.get(0));
+
+        if (message.getGuild().getId().matches(DEANS_SERVER)) audioPlayer.setVolume(volume);
+        else if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();
         else audioPlayer.setVolume(volume);
     }
 

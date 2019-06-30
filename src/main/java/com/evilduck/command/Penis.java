@@ -20,7 +20,7 @@ public class Penis implements PublicCommand, UnstableCommand {
 
     @Override
     @ServiceActivator(inputChannel = "penisChannel")
-    public void execute(Message message) {
+    public void execute(final Message message) {
         final int penisLength = bigDickRepository.findById(
                 message.getAuthor().getId()).isPresent() ? 100 : 1;
 

@@ -72,12 +72,12 @@ public class Poll implements PublicCommand {
     @ServiceActivator(inputChannel = "pollChannel")
     public void execute(final Message message) {
         final String userId = message.getAuthor().getDiscriminator();
-        final Optional<ResponseSession> session = responseSessionRepository.findById(userId);
         final Optional<PollSession> userPoll = pollSessionRepository.findById(userId);
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final String firstArg = args.size() > 0 ? args.get(0) : "";
 
-        if (session.isPresent() && userPoll.isPresent()) startPoll(message, userId, userPoll.get());
+        if (responseSessionRepository.findById(userId).isPresent() && userPoll.isPresent())
+            startPoll(message, userId, userPoll.get());
         else if (userPoll.isPresent() || isCancelCommand(firstArg)) existingPollActions(message, userId);
         else createPoll(message, userId);
     }

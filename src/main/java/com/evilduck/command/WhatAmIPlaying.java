@@ -35,6 +35,7 @@ public class WhatAmIPlaying implements PrivateCommand {
 
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
 
+        // TODO: Don't like how this is setup/working, perhaps it's time to go back to the drawing board???
         final Game whatIAmPlaying;
         final GameType gameType;
         final String gameArg;

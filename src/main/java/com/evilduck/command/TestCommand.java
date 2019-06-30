@@ -14,7 +14,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -51,7 +50,6 @@ public class TestCommand implements PublicCommand, UnstableCommand, PrivateComma
     public void execute(final Message message) {
 
         final String rawMessage = message.getContentRaw();
-        final List<String> args = commandHelper.getArgs(rawMessage);
 
         final Optional<SessionEntity> session = getSessionIfExists(message.getMember());
         if (session.isPresent()) {
@@ -61,7 +59,8 @@ public class TestCommand implements PublicCommand, UnstableCommand, PrivateComma
                     .queue();
             sessionRepository.deleteById(session.get().getId());
         } else {
-            if (args.get(0).equalsIgnoreCase("save")) sessionRepository.save(new SessionEntity(
+            if (commandHelper.getArgs(rawMessage).get(0).equalsIgnoreCase("save"))
+                sessionRepository.save(new SessionEntity(
                     message.getMember().getUser().getId(),
                     commandHelper.getArgsAsString(rawMessage, 2)
             ));

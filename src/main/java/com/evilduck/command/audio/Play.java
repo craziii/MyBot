@@ -3,14 +3,12 @@ package com.evilduck.command.audio;
 import com.evilduck.command.standards.GenericCommand;
 import com.evilduck.command.standards.IsACommand;
 import com.evilduck.command.standards.UnstableCommand;
-import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -27,24 +25,18 @@ public class Play implements GenericCommand, UnstableCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
 
-    private final AudioPlayerManager audioPlayerManager;
     private final AudioPlayer audioPlayer;
-    private final TrackScheduler trackScheduler;
     private final CommandHelper commandHelper;
     private final AudioPlayerSupport audioPlayerSupport;
 
-    public Play(final AudioPlayerManager audioPlayerManager,
-                final AudioPlayer audioPlayer,
-                final TrackScheduler trackScheduler,
+    public Play(final AudioPlayer audioPlayer,
                 final CommandHelper commandHelper,
                 final AudioPlayerSupport audioPlayerSupport) {
-        this.audioPlayerManager = audioPlayerManager;
         this.audioPlayer = audioPlayer;
-        this.trackScheduler = trackScheduler;
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
 
-        audioPlayer.addListener(trackScheduler);
+//        audioPlayer.addListener(trackScheduler);
     }
 
     @Override

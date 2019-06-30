@@ -35,8 +35,6 @@ public class Play implements GenericCommand, UnstableCommand {
         this.audioPlayer = audioPlayer;
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
-
-//        audioPlayer.addListener(trackScheduler);
     }
 
     @Override

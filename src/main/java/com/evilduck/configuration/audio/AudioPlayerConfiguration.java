@@ -32,5 +32,10 @@ public class AudioPlayerConfiguration {
         return audioEventAdapter;
     }
 
+    @Bean
+    public TrackScheduler trackScheduler(final AudioEventAdapter audioEventAdapter) {
+        return (TrackScheduler) audioEventAdapter;
+    }
+
 
 }

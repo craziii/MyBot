@@ -1,6 +1,6 @@
 
- version:       0.31.36.BETA (version.major.minor+opt+bug.release)
- major change:  31
- minor change:  20
- optimizations: 7
- bug fixes:     9
+ version:       0.47.85.BETA (version.major.minor+opt+bug.release)
+ major change:  47
+ minor change:  50
+ optimizations: 18
+ bug fixes:     17

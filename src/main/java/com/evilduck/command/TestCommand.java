@@ -1,9 +1,9 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PrivateCommand;
-import com.evilduck.command.standards.PublicCommand;
-import com.evilduck.command.standards.UnstableCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PrivateCommand;
+import com.evilduck.command.interfaces.PublicCommand;
+import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.entity.SessionEntity;
 import com.evilduck.repository.SessionRepository;
 import com.evilduck.util.CommandHelper;

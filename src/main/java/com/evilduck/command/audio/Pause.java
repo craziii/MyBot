@@ -1,7 +1,7 @@
 package com.evilduck.command.audio;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PrivateCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PrivateCommand;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;

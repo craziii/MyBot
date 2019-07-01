@@ -1,7 +1,7 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PublicCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PublicCommand;
 import com.evilduck.repository.PollSessionRepository;
 import com.evilduck.repository.ResponseSessionRepository;
 import com.evilduck.session.PollSession;

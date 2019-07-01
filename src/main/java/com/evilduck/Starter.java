@@ -1,6 +1,6 @@
 package com.evilduck;
 
-import com.evilduck.command.standards.IsACommand;
+import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.entity.CommandDetail;
 import com.evilduck.repository.BannedPhraseRepository;

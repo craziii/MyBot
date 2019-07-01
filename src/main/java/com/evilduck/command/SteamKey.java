@@ -1,7 +1,7 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PublicCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PublicCommand;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;

@@ -1,8 +1,8 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PrivateCommand;
-import com.evilduck.command.standards.UnstableCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PrivateCommand;
+import com.evilduck.command.interfaces.UnstableCommand;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;

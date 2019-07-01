@@ -1,8 +1,8 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PrivateCommand;
-import com.evilduck.command.standards.UnstableCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PrivateCommand;
+import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.repository.BannedPhraseRepository;
 import com.evilduck.util.CommandHelper;

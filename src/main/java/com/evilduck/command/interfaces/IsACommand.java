@@ -1,4 +1,4 @@
-package com.evilduck.command.standards;
+package com.evilduck.command.interfaces;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,7 +1,7 @@
 package com.evilduck.command.audio;
 
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.PrivateCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.PrivateCommand;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.util.AudioPlayerSupport;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;

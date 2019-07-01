@@ -1,4 +1,4 @@
-package com.evilduck.command.standards;
+package com.evilduck.command.interfaces;
 
 import net.dv8tion.jda.core.entities.Message;
 

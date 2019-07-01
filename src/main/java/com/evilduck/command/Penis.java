@@ -1,7 +1,7 @@
 package com.evilduck.command;
 
-import com.evilduck.command.standards.PublicCommand;
-import com.evilduck.command.standards.UnstableCommand;
+import com.evilduck.command.interfaces.PublicCommand;
+import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.repository.BigDickRepository;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;

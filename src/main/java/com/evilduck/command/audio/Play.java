@@ -1,8 +1,8 @@
 package com.evilduck.command.audio;
 
-import com.evilduck.command.standards.GenericCommand;
-import com.evilduck.command.standards.IsACommand;
-import com.evilduck.command.standards.UnstableCommand;
+import com.evilduck.command.interfaces.GenericCommand;
+import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;

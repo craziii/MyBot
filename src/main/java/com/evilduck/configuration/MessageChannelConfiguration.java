@@ -59,6 +59,11 @@ public class MessageChannelConfiguration {
     }
 
     @Bean
+    public MessageChannel imageChannel() {
+        return new DirectChannel();
+    }
+
+    @Bean
     public MessageChannel kickChannel() {
         return new DirectChannel();
     }

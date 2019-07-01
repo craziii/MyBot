@@ -1,7 +1,7 @@
 package com.evilduck.command.autofirecomponents;
 
-import com.evilduck.command.standards.GenericCommand;
-import com.evilduck.command.standards.IsACommand;
+import com.evilduck.command.interfaces.GenericCommand;
+import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.repository.ResponseSessionRepository;
 import com.evilduck.session.ResponseSession;
 import net.dv8tion.jda.core.entities.Message;

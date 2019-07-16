@@ -27,7 +27,7 @@ public class AudioPlayerConfiguration {
 
     @Bean
     public AudioEventAdapter audioEventAdapter(final AudioPlayer audioPlayer) {
-        final AudioEventAdapter audioEventAdapter = new TrackScheduler(musicPlayerSession);
+        final AudioEventAdapter audioEventAdapter = new TrackScheduler();
         audioPlayer.addListener(audioEventAdapter);
         return audioEventAdapter;
     }

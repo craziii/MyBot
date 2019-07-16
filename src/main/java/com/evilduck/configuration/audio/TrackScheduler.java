@@ -1,5 +1,6 @@
 package com.evilduck.configuration.audio;
 
+import com.evilduck.entity.MusicPlayerSession;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -11,7 +12,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -19,9 +19,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
     private final LinkedBlockingQueue<AudioTrack> queue;
+    private final MusicPlayerSession musicPlayerSession;
 
-    @Autowired
-    public TrackScheduler() {
+    public TrackScheduler(final MusicPlayerSession musicPlayerSession) {
+        this.musicPlayerSession = musicPlayerSession;
         this.queue = new LinkedBlockingQueue<>();
     }
 

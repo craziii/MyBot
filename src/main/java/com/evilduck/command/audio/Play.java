@@ -3,7 +3,9 @@ package com.evilduck.command.audio;
 import com.evilduck.command.interfaces.GenericCommand;
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.UnstableCommand;
+import com.evilduck.entity.MusicPlayerContext;
 import com.evilduck.exception.UserNotInVoiceChannelException;
+import com.evilduck.repository.MusicPlayerContextRepository;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
 import com.jecklgamis.util.Try;
@@ -18,6 +20,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @IsACommand(aliases = {"p", "start"})
@@ -28,13 +31,16 @@ public class Play implements GenericCommand, UnstableCommand {
     private final AudioPlayer audioPlayer;
     private final CommandHelper commandHelper;
     private final AudioPlayerSupport audioPlayerSupport;
+    private final MusicPlayerContextRepository musicPlayerContextRepository;
 
     public Play(final AudioPlayer audioPlayer,
                 final CommandHelper commandHelper,
-                final AudioPlayerSupport audioPlayerSupport) {
+                final AudioPlayerSupport audioPlayerSupport,
+                final MusicPlayerContextRepository musicPlayerContextRepository) {
         this.audioPlayer = audioPlayer;
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
+        this.musicPlayerContextRepository = musicPlayerContextRepository;
     }
 
     @Override
@@ -59,21 +65,38 @@ public class Play implements GenericCommand, UnstableCommand {
             originChannel.sendMessage("You must specify a link to play!").queue();
         } else {
 
-            final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
-                    message.getAuthor().getId(),
-                    message.getGuild().getVoiceChannels());
-            if (voiceChannelTry.isFailure()) {
-                originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
-                return;
+            if (getContextForGuild(message.getGuild().getId()).isPresent()) {
+
+                final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
+                        message.getAuthor().getId(),
+                        message.getGuild().getVoiceChannels());
+                if (voiceChannelTry.isFailure()) {
+                    originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
+                    return;
+                }
+                startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
+            } else {
+
+                saveMusicPlayerContext(message);
             }
-            startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
         }
+    }
+
+    private Optional<MusicPlayerContext> getContextForGuild(final String guildId) {
+        return musicPlayerContextRepository.findById(guildId);
+    }
+
+    private void saveMusicPlayerContext(final Message message) {
+        final MusicPlayerContext context = new MusicPlayerContext();
+        context.setId(message.getGuild().getId());
+        context.setTextChannelId(message.getTextChannel().getId());
+        musicPlayerContextRepository.save(context);
     }
 
     private void startPlayFromLink(final Message message,
                                    final String search,
                                    final VoiceChannel voiceChannelTry) {
-        final boolean searchIsUri = search.matches(".*youtube\\.com/.*");
+        final boolean searchIsUri = search.matches(".*youtu(be\\.com|.be)/.*");
         final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
 
         audioPlayerSupport.startPlayFromLink(message, searchPrefix.concat(search), voiceChannelTry);

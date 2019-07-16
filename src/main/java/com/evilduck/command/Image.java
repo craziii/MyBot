@@ -30,18 +30,13 @@ public class Image implements PublicCommand, UnstableCommand {
     @Override
     @ServiceActivator(inputChannel = "imageChannel")
     public void execute(final Message message) throws IOException {
-        Optional<Message.Attachment> attachedImage = getAttachedImage(message);
+        Optional<Message.Attachment> attachedImage = message.getAttachments().stream().findFirst();
         if (attachedImage.isPresent()) {
             final InputStream inputStream = attachedImage.get().getInputStream();
             final BufferedImage image = ImageIO.read(inputStream);
             final File transformedImage = graphicsTransformer.rotateImage(image, Math.PI / 2);
             message.getTextChannel().sendFile(transformedImage, "transformed.png").queue();
         } else message.getTextChannel().sendMessage("No image attached!").queue();
-    }
-
-    private static final Optional<Message.Attachment> getAttachedImage(final Message message) {
-        final Optional<Message.Attachment> attachment = message.getAttachments().stream().findFirst();
-        return attachment;
     }
 
     @Override

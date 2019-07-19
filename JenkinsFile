@@ -20,7 +20,7 @@ pipeline {
         }
         stage('Start') {
             steps {
-                bat 'java -jar build/libs/evilduck-0.0.1-SNAPSHOT.jar
+                bat 'java -jar build/libs/evilduck-0.0.1-SNAPSHOT.jar'
             }
         }
     }

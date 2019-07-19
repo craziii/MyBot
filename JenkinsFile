@@ -4,23 +4,23 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                sh './gradlew test'
+                sh 'gradlew test'
             }
 
         }
         stage('Clean') {
             steps {
-                sh './gradlew clean'
+                sh 'gradlew clean'
             }
         }
         stage('Build') {
             steps {
-                sh './gradlew build'
+                sh 'gradlew build'
             }
         }
         stage('Start') {
             steps {
-                sh 'java -jar build/libs/evilduck-0.0.1-SNAPSHOT.jar'
+                java -jar build/libs/evilduck-0.0.1-SNAPSHOT.jar
             }
         }
     }

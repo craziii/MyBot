@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.CaseFormat;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import static java.util.Arrays.asList;
 
@@ -85,7 +87,17 @@ public class CommandDetail {
 
     public boolean commandStringMatches(final String commandString) {
         return commandString.toUpperCase().matches(fullCommand.toUpperCase()) || aliases.stream()
-                .anyMatch(alias -> alias.toUpperCase().matches(commandString.toUpperCase()));
+                .anyMatch(alias -> {
+                    try {
+                        return alias.toLowerCase().matches(commandString.toLowerCase());
+                    } catch (PatternSyntaxException e) {
+                        LoggerFactory.getLogger(CommandDetail.class)
+                                .warn("Could not perform regex matching on input! Message: {}, Pattern: {}",
+                                        e.getMessage(),
+                                        e.getPattern());
+                    }
+                    return false;
+                });
     }
 
     @Override

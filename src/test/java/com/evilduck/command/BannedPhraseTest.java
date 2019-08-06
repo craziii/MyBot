@@ -3,9 +3,6 @@ package com.evilduck.command;
 import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.repository.BannedPhraseRepository;
 import com.evilduck.util.CommandHelper;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.requests.restaction.MessageAction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,17 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BannedPhraseTest {
-
-
-    @Mock
-    private Message message;
-
-    @Mock
-    private TextChannel textChannel;
-
-    @Mock
-    private Member member;
+public class BannedPhraseTest extends CommandTest {
 
     @Mock
     private CommandHelper commandHelper;

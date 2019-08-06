@@ -2,7 +2,6 @@ package com.evilduck.command;
 
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.requests.restaction.MessageAction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,16 +10,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PingTest {
-
-    @Mock
-    private Message message;
-
-    @Mock
-    private TextChannel textChannel;
+public class PingTest extends CommandTest {
 
     @Mock
     private MessageAction messageAction;

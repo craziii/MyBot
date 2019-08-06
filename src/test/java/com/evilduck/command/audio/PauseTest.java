@@ -9,19 +9,19 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-class PauseTest {
+public class PauseTest {
 
     private AudioPlayer audioPlayer;
     private Pause pause;
 
     @Before
-    void setUp() {
+    public void setUp() {
         audioPlayer = new DefaultAudioPlayer(new DefaultAudioPlayerManager());
         pause = new Pause(audioPlayer);
     }
 
     @Test
-    void shouldTogglePause() {
+    public void shouldTogglePause() {
         audioPlayer.setPaused(false);
         pause.execute(new MessageBuilder()
                 .append("STUFF")

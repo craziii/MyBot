@@ -70,7 +70,7 @@ public class Kick implements PrivateCommand, UnstableCommand {
     private boolean verifyCommandToRun(final TextChannel channel,
                                        final List<Member> mentionedMembers,
                                        final Member selfMember) {
-        if (mentionedMembers.stream().anyMatch(member -> member.getUser().getName().matches("DuckChan|EvilDuck"))) {
+        if (mentionedMembers.stream().anyMatch(member -> member.getUser().getId().matches("203522057647030272"))) {
             channel.sendMessage("I am sworn to protect my creator!").queue();
             throw new PermissionException(KICK_MEMBERS.getName());
         } else if (!selfMember.hasPermission(KICK_MEMBERS)) {

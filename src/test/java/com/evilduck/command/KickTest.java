@@ -50,30 +50,30 @@ public class KickTest extends CommandTest {
 
     @Test
     public void testKicksMember() {
-        setupMocks("TESTNAME", true, true);
+        setupMocks("TESTID", true, true);
         kick.execute(message);
         verify(controller, times(1)).kick(mentionedMember);
     }
 
     @Test(expected = PermissionException.class)
     public void noKickPermission() {
-        setupMocks("TESTNAME", false, true);
+        setupMocks("TESTID", false, true);
         kick.execute(message);
     }
 
     @Test(expected = PermissionException.class)
     public void cantKickUser() {
-        setupMocks("TESTNAME", true, false);
+        setupMocks("TESTID", true, false);
         kick.execute(message);
     }
 
     @Test(expected = PermissionException.class)
     public void creatorProtection() {
-        setupMocks("EvilDuck", true, true);
+        setupMocks("203522057647030272", true, true);
         kick.execute(message);
     }
 
-    private void setupMocks(final String memberName,
+    private void setupMocks(final String memberId,
                             final boolean hasPermissionToKick,
                             final boolean canKickMember) {
         when(message.getTextChannel()).thenReturn(textChannel);
@@ -82,7 +82,7 @@ public class KickTest extends CommandTest {
         when(message.getMentionedMembers()).thenReturn(singletonList(mentionedMember));
         when(guild.getMember(any(User.class))).thenReturn(mentionedMember);
         when(mentionedMember.getUser()).thenReturn(mentionedUser);
-        when(mentionedUser.getName()).thenReturn(memberName);
+        when(mentionedUser.getId()).thenReturn(memberId);
         when(message.getGuild()).thenReturn(guild);
         when(message.getMember()).thenReturn(selfMember);
         when(guild.getSelfMember()).thenReturn(selfMember);

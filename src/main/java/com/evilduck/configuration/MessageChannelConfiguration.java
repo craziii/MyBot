@@ -78,8 +78,8 @@ public class MessageChannelConfiguration {
         return new DirectChannel();
     }
 
-    @Bean
-    public MessageChannel pollChannel() {
+    @Bean(name = "pollChannel")
+    public DirectChannel pollChannel() {
         return new DirectChannel();
     }
 

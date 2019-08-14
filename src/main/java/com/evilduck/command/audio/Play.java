@@ -58,7 +58,6 @@ public class Play implements GenericCommand, UnstableCommand {
         } else if (args.isEmpty()) {
             originChannel.sendMessage("You must specify a link to play!").queue();
         } else {
-
             final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
                     message.getAuthor().getId(),
                     message.getGuild().getVoiceChannels());

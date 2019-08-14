@@ -120,8 +120,7 @@ public final class Starter {
     private static String loadStartupText() {
         final Try<String> introAsciiArt = TryFactory.attempt(() ->
                 new Scanner(getFile("classpath:jeff_intro.txt"))
-                        .useDelimiter("\\Z").next())
-                .orElse(null);
+                        .useDelimiter("\\Z").next());
         return introAsciiArt.isSuccess() ? introAsciiArt.get() : "";
     }
 

@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.support.MessageBuilder;
@@ -27,7 +28,7 @@ public class Responder implements GenericCommand {
 
     @Autowired
     public Responder(final ResponseSessionRepository responseSessionRepository,
-                     final DirectChannel pollChannel) {
+                     @Qualifier("pollChannel") final DirectChannel pollChannel) {
         this.responseSessionRepository = responseSessionRepository;
         this.pollChannel = pollChannel;
     }

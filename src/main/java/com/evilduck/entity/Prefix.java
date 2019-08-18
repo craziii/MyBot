@@ -9,7 +9,7 @@ public class Prefix {
     }
 
     public boolean matches(final String rawMessage) {
-        return rawMessage.matches("^" + prefix);
+        return rawMessage.startsWith(prefix);
     }
 
     public String getPrefix() {

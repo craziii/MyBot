@@ -31,8 +31,6 @@ public class Help implements PublicCommand {
     @Override
     @ServiceActivator(inputChannel = "helpChannel")
     public void execute(final Message message) {
-
-
         final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();
         final int noOfCommands = commandDetailList.size();
         for (int nextStepStart = 0; nextStepStart < noOfCommands; nextStepStart += 4) {
@@ -46,12 +44,11 @@ public class Help implements PublicCommand {
             final MessageEmbed build = helpEmbed.build();
             message.getTextChannel().sendMessage(build).queue();
         }
-
     }
 
     private static Consumer<CommandDetail> addCommandDetailToEmbed(final EmbedBuilder helpEmbed) {
-        return commandDetail -> helpEmbed.addField(commandDetail.getFullCommand(), commandDetail.getTutorial(), true)
-                .addField("What it Does", commandDetail.getDescription(), true)
-                .addBlankField(false);
+        return commandDetail -> helpEmbed.addField(":question: " + commandDetail.getFullCommand(), commandDetail.getTutorial(), false)
+                .addField("What it Does", commandDetail.getDescription() +
+                        "\n :heavy_minus_sign: :heavy_minus_sign: :heavy_minus_sign: :heavy_minus_sign: :heavy_minus_sign:", false);
     }
 }

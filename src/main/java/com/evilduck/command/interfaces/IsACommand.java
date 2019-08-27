@@ -9,9 +9,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface IsACommand {
 
-    String description() default "";
+    String description() default "No Description Available";
 
-    String[] aliases() default "";
+    String tutorial() default "No Tutorial Available";
+
+    String[] aliases() default "No Aliases";
 
     boolean management() default false;
 

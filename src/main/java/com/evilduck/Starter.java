@@ -110,6 +110,7 @@ public final class Starter {
         final CommandDetail commandDetail = new CommandDetail(commandName.toLowerCase().charAt(0) + commandName.substring(1));
         commandDetail.setAliases(asList(isACommand.aliases()));
         commandDetail.setDescription(isACommand.description());
+        commandDetail.setTutorial(isACommand.tutorial());
 
         LOGGER.info("Found command \'{}\' from class, generated aliases: \'{}\'",
                 commandDetail.getFullCommand(),

@@ -2,6 +2,7 @@ package com.evilduck.command;
 
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PublicCommand;
+import com.evilduck.entity.CommandDetail;
 import com.evilduck.repository.CommandDetailRepository;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -10,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 @Component
-@IsACommand(description = "Displays information about every command this bot has", aliases = "h")
+@IsACommand(
+        tutorial = "Use !help",
+        description = "Displays information about every command this bot has",
+        aliases = "h")
 public class Help implements PublicCommand {
 
     private final CommandDetailRepository commandDetailRepository;
@@ -25,18 +30,32 @@ public class Help implements PublicCommand {
 
     @Override
     @ServiceActivator(inputChannel = "helpChannel")
-    public void execute(final Message message) throws IOException {
+    public void execute(final Message message) {
 
-        final EmbedBuilder helpEmbed = new EmbedBuilder()
-                .setTitle("command Detail List");
 
-        commandDetailRepository.findAll().forEach(commandDetail ->
-                helpEmbed.addField(commandDetail.getFullCommand(), commandDetail.getDescription(), true)
-                        .addField("Ways to call", commandDetail.getTutorial(), true)
-                        .addBlankField(false));
+        final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();
+        final int noOfCommands = commandDetailList.size();
+        final int fieldsPerCommand = 4;
+        final int maxFieldsPerEmbed = 25;
+        for (int nextStepStart = 0;
+             nextStepStart < noOfCommands;
+             nextStepStart += 4) {
+            final int nextStepEnd = (nextStepStart + 4);
+            final List<CommandDetail> nextEmbedGroup = commandDetailList.subList(
+                    nextStepStart,
+                    (nextStepEnd > noOfCommands) ? noOfCommands : nextStepEnd);
+            final EmbedBuilder helpEmbed = new EmbedBuilder()
+                    .setTitle(String.format("%d | JeffBot Command List!", nextStepEnd / 4));
+            nextEmbedGroup.forEach(addCommandDetailToEmbed(helpEmbed));
+            final MessageEmbed build = helpEmbed.build();
+            message.getTextChannel().sendMessage(build).queue();
+        }
 
-        final MessageEmbed build = helpEmbed.build();
-        message.getTextChannel().sendMessage(build).queue();
+    }
 
+    private static Consumer<CommandDetail> addCommandDetailToEmbed(final EmbedBuilder helpEmbed) {
+        return commandDetail -> helpEmbed.addField(commandDetail.getFullCommand(), commandDetail.getTutorial(), true)
+                .addField("What it Does", commandDetail.getDescription(), true)
+                .addBlankField(false);
     }
 }

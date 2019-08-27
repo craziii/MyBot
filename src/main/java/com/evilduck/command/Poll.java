@@ -36,7 +36,7 @@ import static com.evilduck.util.TextColorPrefix.getTextInColor;
 import static java.lang.Long.parseLong;
 
 @Component
-@IsACommand(aliases = {"vote"})
+@IsACommand(description = "Used to create a poll to ask people stuff", tutorial = "Use !poll with options to choose from", aliases = {"vote"})
 public class Poll implements PublicCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Poll.class);

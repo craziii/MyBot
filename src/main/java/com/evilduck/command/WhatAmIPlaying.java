@@ -20,7 +20,7 @@ import static net.dv8tion.jda.core.entities.Game.GameType.WATCHING;
 
 //  TODO: WORK IN PROGRESS!
 @Component
-@IsACommand(aliases = {"waip"})
+@IsACommand(description = "Used to set my status in Discord", tutorial = "Use !whatamiplaying with a message to put as my status", aliases = {"waip"})
 public class WhatAmIPlaying implements PrivateCommand {
 
     private final CommandHelper commandHelper;

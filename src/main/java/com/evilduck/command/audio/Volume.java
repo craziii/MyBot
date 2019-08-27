@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@IsACommand(aliases = "v")
+@IsACommand(description = "Displays or edits the volume output from the bot", tutorial = "Use !volume to display the volume or e.g. \"!volume 69\" to change the volume ", aliases = "v")
 public class Volume implements PrivateCommand {
 
     private static final String DEANS_SERVER = "203522480063643658";

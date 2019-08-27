@@ -18,7 +18,7 @@ import java.util.List;
 import static net.dv8tion.jda.core.Permission.KICK_MEMBERS;
 
 @Component
-@IsACommand(aliases = {"k"})
+@IsACommand(description = "Used to kick members", tutorial = "Use me and mention a member to kick them", aliases = {"k"})
 public class Kick implements PrivateCommand, UnstableCommand {
 
     @Override

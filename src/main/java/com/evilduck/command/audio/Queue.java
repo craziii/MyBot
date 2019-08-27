@@ -17,7 +17,10 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
-@IsACommand(aliases = "q", description = "Displays all audio tracks as a queue")
+@IsACommand(
+        aliases = "q",
+        description = "Displays all songs as a queue",
+        tutorial = "Use !queue")
 public class Queue implements PublicCommand {
 
     private final TrackScheduler trackScheduler;

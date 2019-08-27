@@ -16,7 +16,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Component
-@IsACommand(callable = false)
+@IsACommand(description = "Automatic command that checks for banned phrases!", tutorial = "N/A", callable = false)
 public class CheckBannedPhrase implements GenericCommand {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CheckBannedPhrase.class);

@@ -23,7 +23,7 @@ import java.util.Optional;
 import static java.lang.Math.PI;
 
 @Component
-@IsACommand(aliases = "i")
+@IsACommand(description = "Manipulates images for fun!", tutorial = "Use !image with a keyword command and attach an image to modify it", aliases = "i")
 public class Image implements PublicCommand, UnstableCommand {
 
     private final GraphicsTransformer graphicsTransformer;

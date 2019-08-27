@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-@IsACommand(callable = false)
+@IsACommand(description = "Automatic command that responds to created sessions", tutorial = "N/A", callable = false)
 public class Responder implements GenericCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(Responder.class);

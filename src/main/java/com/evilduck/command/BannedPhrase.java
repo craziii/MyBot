@@ -23,8 +23,8 @@ import static org.apache.commons.lang3.StringUtils.isAlphanumeric;
 @IsACommand(
         management = true,
         description = "Allows adding and removing banned phrases for this server",
-        aliases = {"bp"}
-)
+        aliases = {"bp"},
+        tutorial = "Use me to add or remove a banned phrase to the repository")
 public class BannedPhrase implements PrivateCommand, UnstableCommand {
 
     private final BannedPhraseRepository bannedPhraseRepository;

@@ -17,7 +17,7 @@ import static java.lang.String.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
-@IsACommand(aliases = {"lag"})
+@IsACommand(description = "Used to monitor how much i've been using my lag switch", tutorial = "Use !ping", aliases = {"lag"})
 public class Ping implements PublicCommand, UnstableCommand {
 
     private static final Logger LOGGER = getLogger(Ping.class);

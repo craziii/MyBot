@@ -10,7 +10,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 @Component
-@IsACommand
+@IsACommand(description = "Pauses the currently playing song", tutorial = "Use !pause whilst a song is playing")
 public class Pause implements PrivateCommand {
 
     private final AudioPlayer audioPlayer;

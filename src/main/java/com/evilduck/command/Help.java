@@ -35,11 +35,7 @@ public class Help implements PublicCommand {
 
         final List<CommandDetail> commandDetailList = commandDetailRepository.findAll();
         final int noOfCommands = commandDetailList.size();
-        final int fieldsPerCommand = 4;
-        final int maxFieldsPerEmbed = 25;
-        for (int nextStepStart = 0;
-             nextStepStart < noOfCommands;
-             nextStepStart += 4) {
+        for (int nextStepStart = 0; nextStepStart < noOfCommands; nextStepStart += 4) {
             final int nextStepEnd = (nextStepStart + 4);
             final List<CommandDetail> nextEmbedGroup = commandDetailList.subList(
                     nextStepStart,

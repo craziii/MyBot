@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Component
-@IsACommand
+@IsACommand(description = "This is MY fucking command, don't TOUCH!", tutorial = "What did I say mofo?!")
 public class TestCommand implements PublicCommand, UnstableCommand, PrivateCommand {    // DON'T TRY THIS AT HOME KIDS!
 
     private final SessionRepository sessionRepository;
@@ -61,9 +61,9 @@ public class TestCommand implements PublicCommand, UnstableCommand, PrivateComma
         } else {
             if (commandHelper.getArgs(rawMessage).get(0).equalsIgnoreCase("save"))
                 sessionRepository.save(new SessionEntity(
-                    message.getMember().getUser().getId(),
-                    commandHelper.getArgsAsString(rawMessage, 2)
-            ));
+                        message.getMember().getUser().getId(),
+                        commandHelper.getArgsAsString(rawMessage, 2)
+                ));
         }
 
     }

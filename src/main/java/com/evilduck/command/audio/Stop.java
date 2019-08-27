@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
-@IsACommand
+@IsACommand(description = "Stops the bot playing music", tutorial = "Use !stop when the bot is playing music")
 public class Stop implements PrivateCommand, UnstableCommand {
 
     private final CommandHelper commandHelper;

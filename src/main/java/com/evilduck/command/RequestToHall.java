@@ -1,18 +1,16 @@
 package com.evilduck.command;
 
-import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PublicCommand;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
-@IsACommand(aliases = {"r", "request"})
+//@Component
+//@IsACommand(aliases = {"r", "request"})
 public class RequestToHall implements PublicCommand {
 
     private final JDA jda;

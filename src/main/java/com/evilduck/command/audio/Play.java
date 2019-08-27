@@ -20,7 +20,14 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@IsACommand(aliases = {"p", "start"})
+@IsACommand(
+        description = "Starts up a new song or resumes a song",
+        tutorial = "Use with a link to queue a new song or use it without a link to resume playing the queue",
+        aliases = {
+                "p",
+                "start"
+        }
+)
 public class Play implements GenericCommand, UnstableCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);

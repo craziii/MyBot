@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@IsACommand(aliases = {"s", "next"})
+@IsACommand(description = "Skips the currently playing song", tutorial = "Use !skip when a song is currently playing", aliases = {"s", "next"})
 public class Skip implements PrivateCommand {
 
     private final TrackScheduler trackScheduler;

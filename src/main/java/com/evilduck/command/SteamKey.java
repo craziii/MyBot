@@ -16,7 +16,7 @@ import static java.lang.Integer.parseInt;
 import static org.joda.time.DateTime.now;
 
 @Component
-@IsACommand(aliases = {"sk"})
+@IsACommand(description = "Used to display a message (usually a steam key) after some time delay ", tutorial = "Use !steamkey with your message", aliases = {"sk"})
 public class SteamKey implements PublicCommand {
 
     private static final int COUNTDOWN_DELAY = 10;

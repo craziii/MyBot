@@ -1,17 +1,20 @@
 package com.evilduck.command.interfaces;
 
+import org.springframework.stereotype.Component;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Component
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface IsACommand {
 
-    String description() default "No Description Available";
+    String description();
 
-    String tutorial() default "No Tutorial Available";
+    String tutorial();
 
     String[] aliases() default "No Aliases";
 

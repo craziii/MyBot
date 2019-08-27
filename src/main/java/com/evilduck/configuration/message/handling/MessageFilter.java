@@ -14,11 +14,11 @@ public class MessageFilter {
 
     @Filter
     public boolean commandFilter(final Message message) {
-        if (isNotMyself(message)) return true;
-        else {
-            LOGGER.info("It's my own message! Ignoring.");
+        if (isMyself(message) || isBot(message) || !isValidCommand(message)) {
+            LOGGER.info("Invalid message, ignoring");
             return false;
         }
+        return true;
     }
 
     private boolean isValidCommand(final Message payload) {
@@ -26,8 +26,12 @@ public class MessageFilter {
                 && (payload.getContentRaw().charAt(0) == '!'); // TODO: MAKE THIS CONFIGURABLE
     }
 
-    private static boolean isNotMyself(final Message payload) {
-        return !payload.getAuthor().getDiscriminator().matches(payload.getJDA().getSelfUser().getDiscriminator());
+    private static boolean isBot(final Message payload) {
+        return payload.getAuthor().isBot();
+    }
+
+    private static boolean isMyself(final Message payload) {
+        return payload.getAuthor().getDiscriminator().matches(payload.getJDA().getSelfUser().getDiscriminator());
     }
 
 }

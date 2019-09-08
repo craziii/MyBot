@@ -9,6 +9,8 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Component
 public class AudioPlayerSupport {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AudioPlayerSupport.class);
 
     private final AudioPlayerManager audioPlayerManager;
     private final AudioPlayer audioPlayer;
@@ -60,20 +64,23 @@ public class AudioPlayerSupport {
 
     private static void displayPlayingTrack(final AudioTrack audioTrack,
                                             final TextChannel textChannel) {
-        final long duration = audioTrack.getDuration();
-        final long hours = HOURS.convert(duration, MILLISECONDS);
-        final long minutes = MINUTES.convert(duration, MILLISECONDS) - (60 * hours);
-        final long seconds = SECONDS.convert(duration, MILLISECONDS) - (60 * minutes);
+        if (audioTrack == null) {
+            LOGGER.warn("Tried to display null audio track!");
+        } else {
+            final long duration = audioTrack.getDuration();
+            final long hours = HOURS.convert(duration, MILLISECONDS);
+            final long minutes = MINUTES.convert(duration, MILLISECONDS) - (60 * hours);
+            final long seconds = SECONDS.convert(duration, MILLISECONDS) - (60 * minutes);
 
-        textChannel.sendMessage(new EmbedBuilder().setTitle("Queued Track")
-                .addField("Title", audioTrack.getInfo().title, false)
-                .addField("Origin", audioTrack.getInfo().uri, false)
-                .addField("Duration",
-                        hours > 1 ?
-                                String.format("%d:%d:%d", hours, minutes, seconds) :
-                                String.format("%d:%d", minutes, seconds), false)
-                .build())
-                .queue();
+            textChannel.sendMessage(new EmbedBuilder().setTitle("Queued Track")
+                    .addField("Title", audioTrack.getInfo().title, false)
+                    .addField("Origin", audioTrack.getInfo().uri, false)
+                    .addField("Duration",
+                            hours > 1 ?
+                                    String.format("%d:%d:%d", hours, minutes, seconds) :
+                                    String.format("%d:%d", minutes, seconds), false)
+                    .build())
+                    .queue();
+        }
     }
-
 }

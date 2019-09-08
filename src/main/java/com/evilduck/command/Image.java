@@ -52,8 +52,15 @@ public class Image implements PublicCommand, UnstableCommand {
                     attachedImage.get(),
                     new TransformType(args.get(0), args),
                     originChannel);
-            if (transformedImage.isPresent()) originChannel.sendFile(transformedImage.get(), "transformed.png").queue();
-            else originChannel.sendMessage("I don't recognise that image command").queue();
+            if (transformedImage.isPresent()) {
+                originChannel.sendFile(transformedImage.get(), "transformed.png")
+                        .queue((success) -> {
+                        }, failure -> originChannel.sendMessage("I was unable to perform your transform! Reason: " + failure.getMessage()));
+                {
+
+                }
+                ;
+            } else originChannel.sendMessage("I don't recognise that image command").queue();
         } else originChannel.sendMessage("No image attached!").queue();
     }
 

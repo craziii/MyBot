@@ -1,6 +1,7 @@
 package com.evilduck.configuration.message.handling;
 
 
+import com.evilduck.repository.SimpleConfigurationRepository;
 import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,12 @@ public class MessageFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilter.class);
 
+    private final SimpleConfigurationRepository configurationRepository;
+
+    public MessageFilter(final SimpleConfigurationRepository configurationRepository) {
+        this.configurationRepository = configurationRepository;
+    }
+
     @Filter
     public boolean commandFilter(final Message message) {
         if (isMyself(message) || isBot(message) || !isValidCommand(message)) {
@@ -22,8 +29,10 @@ public class MessageFilter {
     }
 
     private boolean isValidCommand(final Message payload) {
-        return payload.getContentRaw().length() > 0
-                && (payload.getContentRaw().charAt(0) == '!'); // TODO: MAKE THIS CONFIGURABLE
+        final String contentRaw = payload.getContentRaw();
+        return (contentRaw.length() > 0)
+                && (contentRaw.startsWith(configurationRepository.getPrefix())
+                || payload.getMentionedUsers().contains(payload.getJDA().getSelfUser()));
     }
 
     private static boolean isBot(final Message payload) {

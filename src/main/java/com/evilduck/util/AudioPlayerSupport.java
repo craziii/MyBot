@@ -51,12 +51,20 @@ public class AudioPlayerSupport {
     public void next(final TextChannel textChannel) {
         audioPlayer.stopTrack();
         final AudioTrack nextTrack = trackScheduler.getNextTrack();
+        if (nextTrack == null) {
+            textChannel.getGuild().getAudioManager().closeAudioConnection();
+            return;
+        }
         audioPlayer.playTrack(nextTrack);
         displayPlayingTrack(nextTrack, textChannel);
     }
 
     public void play(final AudioTrack audioTrack,
                      final TextChannel textChannel) {
+        if (audioTrack == null) {
+            textChannel.getGuild().getAudioManager().closeAudioConnection();
+            return;
+        }
         if (!audioPlayer.startTrack(audioTrack, true)) trackScheduler.offer(audioTrack);
         displayPlayingTrack(audioTrack, textChannel);
     }

@@ -19,15 +19,18 @@ public class AudioResultHandler implements AudioLoadResultHandler {
     private final Message message;
     private final VoiceChannel voiceChannel;
     private final AudioPlayer audioPlayer;
+    private final TrackScheduler trackScheduler;
     private final AudioPlayerSupport audioPlayerSupport;
 
     public AudioResultHandler(final Message message,
                               final VoiceChannel voiceChannel,
                               final AudioPlayer audioPlayer,
+                              final TrackScheduler trackScheduler,
                               final AudioPlayerSupport audioPlayerSupport) {
         this.message = message;
         this.voiceChannel = voiceChannel;
         this.audioPlayer = audioPlayer;
+        this.trackScheduler = trackScheduler;
         this.audioPlayerSupport = audioPlayerSupport;
     }
 
@@ -37,7 +40,7 @@ public class AudioResultHandler implements AudioLoadResultHandler {
         final AudioManager audioManager = message.getTextChannel().getGuild().getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
-        audioPlayerSupport.play(track, message.getTextChannel());
+        audioPlayerSupport.play(track, audioPlayer, trackScheduler, message.getTextChannel());
     }
 
 

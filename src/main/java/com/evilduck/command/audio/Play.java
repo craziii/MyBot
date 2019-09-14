@@ -3,12 +3,18 @@ package com.evilduck.command.audio;
 import com.evilduck.command.interfaces.GenericCommand;
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.UnstableCommand;
+import com.evilduck.configuration.audio.AudioPlayerManagerAccessor;
+import com.evilduck.configuration.audio.AudioResultHandler;
+import com.evilduck.configuration.audio.CacheableAudioPlayerProvider;
+import com.evilduck.configuration.audio.TrackScheduler;
+import com.evilduck.configuration.audio.TrackSchedulerProvider;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
 import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -32,16 +38,22 @@ public class Play implements GenericCommand, UnstableCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Play.class);
 
-    private final AudioPlayer audioPlayer;
     private final CommandHelper commandHelper;
     private final AudioPlayerSupport audioPlayerSupport;
+    private final TrackSchedulerProvider trackSchedulerProvider;
+    private final CacheableAudioPlayerProvider audioPlayerProvider;
+    private final AudioPlayerManagerAccessor audioPlayerManagerAccessor;
 
-    public Play(final AudioPlayer audioPlayer,
-                final CommandHelper commandHelper,
-                final AudioPlayerSupport audioPlayerSupport) {
-        this.audioPlayer = audioPlayer;
+    public Play(final CommandHelper commandHelper,
+                final AudioPlayerSupport audioPlayerSupport,
+                final TrackSchedulerProvider trackSchedulerProvider,
+                final CacheableAudioPlayerProvider audioPlayerProvider,
+                final AudioPlayerManagerAccessor audioPlayerManagerAccessor) {
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
+        this.trackSchedulerProvider = trackSchedulerProvider;
+        this.audioPlayerProvider = audioPlayerProvider;
+        this.audioPlayerManagerAccessor = audioPlayerManagerAccessor;
     }
 
     @Override
@@ -59,7 +71,8 @@ public class Play implements GenericCommand, UnstableCommand {
     public void execute(final Message message) {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        if (audioPlayer.isPaused()) {
+        final AudioPlayer audioPlayer = audioPlayerProvider.getPlayerForGuild(message.getGuild().getId()).getPlayer();
+        if (args.isEmpty() && audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
             originChannel.sendMessage("Resuming: " + audioPlayer.getPlayingTrack().getInfo().title).queue();
         } else if (args.isEmpty()) {
@@ -72,17 +85,21 @@ public class Play implements GenericCommand, UnstableCommand {
                 originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
                 return;
             }
-            startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get());
+            final TrackScheduler trackScheduler = trackSchedulerProvider.getAudioEventAdapter(message.getGuild().getId());
+            startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get(), audioPlayer, trackScheduler);
         }
     }
 
     private void startPlayFromLink(final Message message,
                                    final String search,
-                                   final VoiceChannel voiceChannelTry) {
+                                   final VoiceChannel voiceChannelTry,
+                                   final AudioPlayer audioPlayer,
+                                   final TrackScheduler trackScheduler) {
         final boolean searchIsUri = search.matches(".*youtube\\.com/.*");
         final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
-
-        audioPlayerSupport.startPlayFromLink(message, searchPrefix.concat(search), voiceChannelTry);
+        final AudioPlayerManager audioPlayerManager = audioPlayerManagerAccessor.getAudioPlayerManager();
+        final AudioResultHandler resultHandler = new AudioResultHandler(message, voiceChannelTry, audioPlayer, trackScheduler, audioPlayerSupport);
+        audioPlayerManager.loadItem((searchPrefix + search), resultHandler);
 
     }
 

@@ -11,17 +11,21 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Id;
 
 import java.util.concurrent.LinkedBlockingQueue;
+
 
 public class TrackScheduler extends AudioEventAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
+
+    @Id
+    private final String guildId;
     private final LinkedBlockingQueue<AudioTrack> queue;
 
-    @Autowired
-    public TrackScheduler() {
+    public TrackScheduler(final String guildId) {
+        this.guildId = guildId;
         this.queue = new LinkedBlockingQueue<>();
     }
 
@@ -39,7 +43,6 @@ public class TrackScheduler extends AudioEventAdapter {
         } else {
             LOGGER.error("An undefined AudioEvent has occurred! {}", event.toString());
         }
-
     }
 
     @Override
@@ -87,4 +90,7 @@ public class TrackScheduler extends AudioEventAdapter {
         return queue;
     }
 
+    public String getGuildId() {
+        return guildId;
+    }
 }

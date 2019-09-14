@@ -2,6 +2,7 @@ package com.evilduck.command.audio;
 
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PrivateCommand;
+import com.evilduck.configuration.audio.CacheableAudioPlayerProvider;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -13,12 +14,13 @@ import org.springframework.stereotype.Component;
 @IsACommand(description = "Pauses the currently playing song", tutorial = "Use !pause whilst a song is playing")
 public class Pause implements PrivateCommand {
 
-    private final AudioPlayer audioPlayer;
+    private final CacheableAudioPlayerProvider audioPlayerProvider;
 
     @Autowired
-    public Pause(final AudioPlayer audioPlayer) {
-        this.audioPlayer = audioPlayer;
+    public Pause(final CacheableAudioPlayerProvider audioPlayerProvider) {
+        this.audioPlayerProvider = audioPlayerProvider;
     }
+
 
     @Override
     public boolean hasPermissionToRun(Member requestingMember) {
@@ -28,6 +30,7 @@ public class Pause implements PrivateCommand {
     @Override
     @ServiceActivator(inputChannel = "pauseChannel")
     public void execute(Message message) {
+        final AudioPlayer audioPlayer = audioPlayerProvider.getPlayerForGuild(message.getGuild().getId()).getPlayer();
         audioPlayer.setPaused(!audioPlayer.isPaused());
     }
 }

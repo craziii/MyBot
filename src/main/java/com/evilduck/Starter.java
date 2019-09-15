@@ -57,7 +57,7 @@ public final class Starter {
 
     @PostConstruct
     public void init() {
-        LOGGER.info("JeffBot is starting...");
+        LOGGER.info("Deployment [15/09/2019 | 03:38]JeffBot is starting...");
         System.out.println(loadStartupText());
 
         final StringBuilder outputListString = new StringBuilder();

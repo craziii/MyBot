@@ -2,6 +2,7 @@ package com.evilduck.configuration.audio;
 
 import com.evilduck.entity.CachableAudioContext;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.dv8tion.jda.core.entities.Guild;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,10 @@ public class CacheableAudioContextProvider {
         this.audioPlayerManagerAccessor = audioPlayerManagerAccessor;
     }
 
-    @Cacheable(value = "audio_player")
-    public CachableAudioContext getAudioContextForGuild(final String guildId) {
+    @Cacheable(value = "audio_player", key = "#guild.getId()")
+    public CachableAudioContext getAudioContextForGuild(final Guild guild) {
         final AudioPlayer player = audioPlayerManagerAccessor.getAudioPlayerManager().createPlayer();
-        return new CachableAudioContext(guildId, player);
+        return new CachableAudioContext(guild, player);
     }
 
 }

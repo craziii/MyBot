@@ -30,7 +30,7 @@ public class Pause implements PrivateCommand {
     @Override
     @ServiceActivator(inputChannel = "pauseChannel")
     public void execute(Message message) {
-        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild().getId()).getPlayer();
+        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild()).getPlayer();
         audioPlayer.setPaused(!audioPlayer.isPaused());
     }
 }

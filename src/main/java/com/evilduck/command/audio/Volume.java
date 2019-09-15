@@ -47,7 +47,7 @@ public class Volume implements PrivateCommand {
         }
 
         final int volume = Integer.parseInt(args.get(0));
-        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild().getId()).getPlayer();
+        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild()).getPlayer();
 
         if (message.getGuild().getId().matches(DEANS_SERVER)) audioPlayer.setVolume(volume);
         else if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();

@@ -9,10 +9,14 @@ import com.sedmelluq.discord.lavaplayer.player.event.TrackEndEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.TrackStartEvent;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import net.dv8tion.jda.core.entities.Guild;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -21,25 +25,35 @@ public class TrackScheduler extends AudioEventAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackScheduler.class);
 
     @Id
-    private final String guildId;
+    private final Guild guild;
     private final LinkedBlockingQueue<AudioTrack> queue;
+    private final Timer disconnectTimer;
+    private final DisconnectTask disconnectTask;
 
-    public TrackScheduler(final String guildId) {
-        this.guildId = guildId;
+
+    public TrackScheduler(final Guild guild) {
+        this.guild = guild;
         this.queue = new LinkedBlockingQueue<>();
+        disconnectTimer = new Timer();
+        disconnectTask = new DisconnectTask(guild);
     }
 
     @Override
     public void onEvent(final AudioEvent event) {
         final AudioPlayer player = event.player;
         if (event instanceof TrackStartEvent) {
+            disconnectTimer.cancel();
             onTrackStart(player, ((TrackStartEvent) event).track);
         } else if (event instanceof TrackEndEvent) {
+            disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(10).toDate());
             onTrackEnd(player, ((TrackEndEvent) event).track, ((TrackEndEvent) event).endReason);
         } else if (event instanceof PlayerResumeEvent) {
+            disconnectTimer.cancel();
             onPlayerResume(player);
         } else if (event instanceof PlayerPauseEvent) {
+            disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(60).toDate());
             onPlayerPause(player);
+            // TODO: Look into a future impl making bot auto leave
         } else {
             LOGGER.error("An undefined AudioEvent has occurred! {}", event.toString());
         }
@@ -90,7 +104,21 @@ public class TrackScheduler extends AudioEventAdapter {
         return queue;
     }
 
-    public String getGuildId() {
-        return guildId;
+    public Guild getGuild() {
+        return guild;
+    }
+
+    private class DisconnectTask extends TimerTask {
+
+        private final Guild guild;
+
+        private DisconnectTask(final Guild guild) {
+            this.guild = guild;
+        }
+
+        @Override
+        public void run() {
+            guild.getAudioManager().closeAudioConnection();
+        }
     }
 }

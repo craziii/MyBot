@@ -68,7 +68,7 @@ public class Play implements GenericCommand, UnstableCommand {
     public void execute(final Message message) {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(message.getGuild().getId());
+        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(message.getGuild());
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         if (args.isEmpty() && audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);

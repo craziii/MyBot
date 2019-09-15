@@ -37,7 +37,7 @@ public class Queue implements PublicCommand {
     @ServiceActivator(inputChannel = "queueChannel")
     public void execute(final Message message) {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild().getId());
+        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild());
         final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
         if (!args.isEmpty()) {
             if (args.get(0).toLowerCase().matches("clear|empty|dump")) {

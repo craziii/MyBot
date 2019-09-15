@@ -35,7 +35,7 @@ public class Skip implements PrivateCommand {
     @Override
     @ServiceActivator(inputChannel = "skipChannel")
     public void execute(final Message message) {
-        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild().getId());
+        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild());
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
         audioPlayerSupport.next(message.getTextChannel(), audioPlayer, trackScheduler);

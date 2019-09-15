@@ -7,6 +7,7 @@ import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,10 @@ public class Stop implements PrivateCommand, UnstableCommand {
     @ServiceActivator(inputChannel = "stopChannel")
     public void execute(final Message message) {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final TrackScheduler trackScheduler = audioContextProvider.getAudioContextForGuild(message.getGuild().getId()).getTrackScheduler();
+        final Guild guild = message.getGuild();
+        final TrackScheduler trackScheduler = audioContextProvider.getAudioContextForGuild(guild).getTrackScheduler();
         if (args.size() > 0 && args.get(0).toLowerCase().matches("all")) trackScheduler.clear();
-        final AudioPlayer audioPlayer = audioContextProvider.getAudioContextForGuild(message.getGuild().getId()).getPlayer();
+        final AudioPlayer audioPlayer = audioContextProvider.getAudioContextForGuild(guild).getPlayer();
         audioPlayer.stopTrack();
     }
 

@@ -2,25 +2,26 @@ package com.evilduck.entity;
 
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.dv8tion.jda.core.entities.Guild;
 import org.springframework.data.annotation.Id;
 
 public class CachableAudioContext {
 
     @Id
-    private final String guildId;
+    private final Guild guildId;
     private final AudioPlayer player;
     private final TrackScheduler trackScheduler;
 
-    public CachableAudioContext(final String guildId,
+    public CachableAudioContext(final Guild guild,
                                 final AudioPlayer player) {
-        this.trackScheduler = new TrackScheduler(guildId);
+        this.trackScheduler = new TrackScheduler(guild);
         player.setVolume(25);
-        this.guildId = guildId;
+        this.guildId = guild;
         this.player = player;
         this.player.addListener(trackScheduler);
     }
 
-    public String getGuildId() {
+    public Guild getGuildId() {
         return guildId;
     }
 

@@ -17,7 +17,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,7 +45,8 @@ public class PauseTest {
     @Before
     public void setUp() {
         audioPlayer = new DefaultAudioPlayer(new DefaultAudioPlayerManager());
-        when(audioContextProvider.getAudioContextForGuild(anyString())).thenReturn(cachableAudioContext);
+        when(message.getGuild()).thenReturn(guild);
+        when(audioContextProvider.getAudioContextForGuild(guild)).thenReturn(cachableAudioContext);
         when(cachableAudioContext.getPlayer()).thenReturn(audioPlayer);
         pause = new Pause(audioContextProvider);
     }
@@ -55,7 +55,7 @@ public class PauseTest {
     public void shouldTogglePause() {
         audioPlayer.setPaused(false);
         when(message.getGuild()).thenReturn(guild);
-        when(guild.getId()).thenReturn("GUILDID");
+        when(guild.getId()).thenReturn("GUILD_ID");
         pause.execute(message);
         assertTrue(audioPlayer.isPaused());
     }

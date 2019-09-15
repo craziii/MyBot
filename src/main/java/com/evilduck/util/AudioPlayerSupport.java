@@ -23,9 +23,7 @@ public class AudioPlayerSupport {
                      final AudioPlayer audioPlayer,
                      final TrackScheduler trackScheduler,
                      final TextChannel textChannel) {
-        if (isEmptyTrack(textChannel, audioTrack)) {
-            return;
-        }
+        if (isEmptyTrack(textChannel, audioTrack)) return;
         if (!audioPlayer.startTrack(audioTrack, true)) trackScheduler.offer(audioTrack);
         displayPlayingTrack(audioTrack, textChannel);
     }

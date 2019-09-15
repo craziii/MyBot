@@ -2,7 +2,7 @@ package com.evilduck.command.audio;
 
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PrivateCommand;
-import com.evilduck.configuration.audio.CacheableAudioPlayerProvider;
+import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;
@@ -20,11 +20,11 @@ public class Volume implements PrivateCommand {
 
     private static final String DEANS_SERVER = "203522480063643658";
 
-    private final CacheableAudioPlayerProvider audioPlayerProvider;
+    private final CacheableAudioContextProvider audioPlayerProvider;
     private final CommandHelper commandHelper;
 
     @Autowired
-    public Volume(final CacheableAudioPlayerProvider audioPlayerProvider,
+    public Volume(final CacheableAudioContextProvider audioPlayerProvider,
                   final CommandHelper commandHelper) {
         this.audioPlayerProvider = audioPlayerProvider;
         this.commandHelper = commandHelper;
@@ -47,7 +47,7 @@ public class Volume implements PrivateCommand {
         }
 
         final int volume = Integer.parseInt(args.get(0));
-        final AudioPlayer audioPlayer = audioPlayerProvider.getPlayerForGuild(message.getGuild().getId()).getPlayer();
+        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild().getId()).getPlayer();
 
         if (message.getGuild().getId().matches(DEANS_SERVER)) audioPlayer.setVolume(volume);
         else if (volume < 0 || volume > 100) originChannel.sendMessage("Volume must be between 0 and 100!").queue();

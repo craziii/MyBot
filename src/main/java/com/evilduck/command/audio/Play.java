@@ -5,9 +5,9 @@ import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.configuration.audio.AudioPlayerManagerAccessor;
 import com.evilduck.configuration.audio.AudioResultHandler;
-import com.evilduck.configuration.audio.CacheableAudioPlayerProvider;
+import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
-import com.evilduck.configuration.audio.TrackSchedulerProvider;
+import com.evilduck.entity.CachableAudioContext;
 import com.evilduck.exception.UserNotInVoiceChannelException;
 import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
@@ -40,18 +40,15 @@ public class Play implements GenericCommand, UnstableCommand {
 
     private final CommandHelper commandHelper;
     private final AudioPlayerSupport audioPlayerSupport;
-    private final TrackSchedulerProvider trackSchedulerProvider;
-    private final CacheableAudioPlayerProvider audioPlayerProvider;
+    private final CacheableAudioContextProvider audioPlayerProvider;
     private final AudioPlayerManagerAccessor audioPlayerManagerAccessor;
 
     public Play(final CommandHelper commandHelper,
                 final AudioPlayerSupport audioPlayerSupport,
-                final TrackSchedulerProvider trackSchedulerProvider,
-                final CacheableAudioPlayerProvider audioPlayerProvider,
+                final CacheableAudioContextProvider audioPlayerProvider,
                 final AudioPlayerManagerAccessor audioPlayerManagerAccessor) {
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
-        this.trackSchedulerProvider = trackSchedulerProvider;
         this.audioPlayerProvider = audioPlayerProvider;
         this.audioPlayerManagerAccessor = audioPlayerManagerAccessor;
     }
@@ -71,7 +68,8 @@ public class Play implements GenericCommand, UnstableCommand {
     public void execute(final Message message) {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final AudioPlayer audioPlayer = audioPlayerProvider.getPlayerForGuild(message.getGuild().getId()).getPlayer();
+        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(message.getGuild().getId());
+        final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         if (args.isEmpty() && audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
             originChannel.sendMessage("Resuming: " + audioPlayer.getPlayingTrack().getInfo().title).queue();
@@ -85,7 +83,7 @@ public class Play implements GenericCommand, UnstableCommand {
                 originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
                 return;
             }
-            final TrackScheduler trackScheduler = trackSchedulerProvider.getAudioEventAdapter(message.getGuild().getId());
+            final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
             startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get(), audioPlayer, trackScheduler);
         }
     }

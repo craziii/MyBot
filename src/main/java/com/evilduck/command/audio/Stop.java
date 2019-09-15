@@ -3,9 +3,8 @@ package com.evilduck.command.audio;
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PrivateCommand;
 import com.evilduck.command.interfaces.UnstableCommand;
-import com.evilduck.configuration.audio.CacheableAudioPlayerProvider;
+import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
-import com.evilduck.configuration.audio.TrackSchedulerProvider;
 import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Member;
@@ -21,16 +20,13 @@ import java.util.List;
 public class Stop implements PrivateCommand, UnstableCommand {
 
     private final CommandHelper commandHelper;
-    private final TrackSchedulerProvider trackSchedulerProvider;
-    private final CacheableAudioPlayerProvider audioPlayerProvider;
+    private final CacheableAudioContextProvider audioContextProvider;
 
     @Autowired
     public Stop(final CommandHelper commandHelper,
-                final TrackSchedulerProvider trackSchedulerProvider,
-                final CacheableAudioPlayerProvider audioPlayerProvider) {
+                final CacheableAudioContextProvider audioContextProvider) {
         this.commandHelper = commandHelper;
-        this.trackSchedulerProvider = trackSchedulerProvider;
-        this.audioPlayerProvider = audioPlayerProvider;
+        this.audioContextProvider = audioContextProvider;
     }
 
     @Override
@@ -52,9 +48,9 @@ public class Stop implements PrivateCommand, UnstableCommand {
     @ServiceActivator(inputChannel = "stopChannel")
     public void execute(final Message message) {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final TrackScheduler trackScheduler = trackSchedulerProvider.getAudioEventAdapter(message.getGuild().getId());
+        final TrackScheduler trackScheduler = audioContextProvider.getAudioContextForGuild(message.getGuild().getId()).getTrackScheduler();
         if (args.size() > 0 && args.get(0).toLowerCase().matches("all")) trackScheduler.clear();
-        final AudioPlayer audioPlayer = audioPlayerProvider.getPlayerForGuild(message.getGuild().getId()).getPlayer();
+        final AudioPlayer audioPlayer = audioContextProvider.getAudioContextForGuild(message.getGuild().getId()).getPlayer();
         audioPlayer.stopTrack();
     }
 

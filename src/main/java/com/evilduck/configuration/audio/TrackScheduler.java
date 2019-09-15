@@ -29,6 +29,7 @@ public class TrackScheduler extends AudioEventAdapter {
     private final LinkedBlockingQueue<AudioTrack> queue;
     private final Timer disconnectTimer;
     private final DisconnectTask disconnectTask;
+    private boolean disconnectScheduled;
 
 
     public TrackScheduler(final Guild guild) {
@@ -36,22 +37,27 @@ public class TrackScheduler extends AudioEventAdapter {
         this.queue = new LinkedBlockingQueue<>();
         disconnectTimer = new Timer();
         disconnectTask = new DisconnectTask(guild);
+        disconnectScheduled = false;
     }
 
     @Override
     public void onEvent(final AudioEvent event) {
         final AudioPlayer player = event.player;
         if (event instanceof TrackStartEvent) {
-            disconnectTimer.cancel();
+            if (disconnectScheduled) disconnectTimer.cancel();
+            disconnectScheduled = false;
             onTrackStart(player, ((TrackStartEvent) event).track);
         } else if (event instanceof TrackEndEvent) {
             disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(10).toDate());
+            disconnectScheduled = true;
             onTrackEnd(player, ((TrackEndEvent) event).track, ((TrackEndEvent) event).endReason);
         } else if (event instanceof PlayerResumeEvent) {
-            disconnectTimer.cancel();
+            if (disconnectScheduled) disconnectTimer.cancel();
+            disconnectScheduled = false;
             onPlayerResume(player);
         } else if (event instanceof PlayerPauseEvent) {
             disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(60).toDate());
+            disconnectScheduled = true;
             onPlayerPause(player);
             // TODO: Look into a future impl making bot auto leave
         } else {

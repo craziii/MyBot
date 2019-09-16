@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -31,11 +32,9 @@ public class AudioPlayerSupport {
     public void next(final TextChannel textChannel,
                      final AudioPlayer audioPlayer,
                      final TrackScheduler trackScheduler) {
-        audioPlayer.stopTrack();
         final AudioTrack nextTrack = trackScheduler.getNextTrack();
-        if (isEmptyTrack(textChannel, nextTrack)) return;
-        audioPlayer.playTrack(nextTrack);
-        displayPlayingTrack(nextTrack, textChannel);
+        if (!audioPlayer.startTrack(nextTrack, false)) textChannel.sendMessage("I had a problem playing the next track!").queue();
+        else displayPlayingTrack(nextTrack, textChannel);
     }
 
     private boolean isEmptyTrack(final TextChannel textChannel,
@@ -60,10 +59,10 @@ public class AudioPlayerSupport {
             textChannel.sendMessage(new EmbedBuilder().setTitle("Queued Track")
                     .addField("Title", audioTrack.getInfo().title, false)
                     .addField("Origin", audioTrack.getInfo().uri, false)
-                    .addField("Duration",
-                            hours > 1 ?
-                                    String.format("%d:%d:%d", hours, minutes, seconds) :
-                                    String.format("%d:%d", minutes, seconds), false)
+                    .addField("Duration", hours > 1 ?
+                                    format("%d:%02d:%02d", hours, minutes, seconds) :
+                                    format("%d:%02d", minutes, seconds),
+                            false)
                     .build())
                     .queue();
         }

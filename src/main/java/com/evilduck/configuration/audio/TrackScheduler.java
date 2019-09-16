@@ -26,34 +26,36 @@ public class TrackScheduler extends AudioEventAdapter {
     private final Guild guild;
     private final LinkedBlockingQueue<AudioTrack> queue;
     private final Timer disconnectTimer;
-    private final DisconnectTask disconnectTask;
-    private boolean isPlaying;
+    private boolean disconnectEnabled;
+    private boolean disconnectScheduled;
 
 
     public TrackScheduler(final Guild guild) {
         this.guild = guild;
         this.queue = new LinkedBlockingQueue<>();
         disconnectTimer = new Timer();
-        disconnectTask = new DisconnectTask();
-        isPlaying = false;
+        disconnectEnabled = false;
+        disconnectScheduled = false;
     }
 
     @Override
     public void onEvent(final AudioEvent event) {
         final AudioPlayer player = event.player;
         if (event instanceof TrackStartEvent) {
-            isPlaying = true;
+            disconnectEnabled = false;
             onTrackStart(player, ((TrackStartEvent) event).track);
         } else if (event instanceof TrackEndEvent) {
-            isPlaying = false;
-            disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(10).toDate());
+            if (!disconnectScheduled) disconnectTimer.schedule(new DisconnectTask(), DateTime.now().plusSeconds(10).toDate());
+            disconnectScheduled = true;
+            disconnectEnabled = true;
             onTrackEnd(player, ((TrackEndEvent) event).track, ((TrackEndEvent) event).endReason);
         } else if (event instanceof PlayerResumeEvent) {
-            isPlaying = true;
+            disconnectEnabled = false;
             onPlayerResume(player);
         } else if (event instanceof PlayerPauseEvent) {
-            isPlaying = false;
-            disconnectTimer.schedule(disconnectTask, DateTime.now().plusSeconds(60).toDate());
+            if (!disconnectScheduled) disconnectTimer.schedule(new DisconnectTask(), DateTime.now().plusSeconds(60).toDate());
+            disconnectScheduled = true;
+            disconnectEnabled = true;
             onPlayerPause(player);
         } else {
             LOGGER.error("An undefined AudioEvent has occurred! {}", event.toString());
@@ -113,7 +115,11 @@ public class TrackScheduler extends AudioEventAdapter {
 
         @Override
         public void run() {
-            if (!isPlaying) guild.getAudioManager().closeAudioConnection();
+            if (disconnectEnabled) {
+                LOGGER.info("Leaving Voice Channel {}", guild.getAudioManager().getConnectedChannel());
+                guild.getAudioManager().closeAudioConnection();
+            }
+            disconnectScheduled = false;
         }
     }
 }

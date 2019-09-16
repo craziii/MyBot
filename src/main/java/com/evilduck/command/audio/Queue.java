@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static java.lang.String.format;
+
 @Component
 @IsACommand(
         aliases = "q",
@@ -52,6 +54,9 @@ public class Queue implements PublicCommand {
             if (playingTrack != null) {
                 final EmbedBuilder embedBuilder = new EmbedBuilder();
                 embedBuilder.addField("Currently Playing", playingTrack.getInfo().title, false);
+                final String trackUri = playingTrack.getInfo().uri;
+                embedBuilder.setThumbnail(trackUri.contains("youtu.be") || trackUri.contains("youtube") ?
+                        format("https://img.youtube.com/vi/%s/0.jpg", playingTrack.getInfo().identifier) : null);
                 populateQueueEmbed(queue, embedBuilder);
                 embedBuilder.setTitle("Current Queue");
                 message.getTextChannel().sendMessage(embedBuilder.build()).queue();
@@ -64,8 +69,11 @@ public class Queue implements PublicCommand {
 
     private void populateQueueEmbed(final LinkedBlockingQueue<AudioTrack> queue,
                                     final EmbedBuilder embedBuilder) {
-        queue.forEach(audioTrack -> embedBuilder.addField("Name", audioTrack.getInfo().title, false));
+        int i = 2;
+        for (final AudioTrack audioTrack : queue) {
+            embedBuilder.addField(i == 2 ? "Up Next" : "Track " + i, audioTrack.getInfo().title, false);
+            i++;
+        }
     }
-
 
 }

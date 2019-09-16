@@ -23,13 +23,11 @@ public class HealthReport {
         this.jda = jda;
     }
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 1800000)
     public void healthReport() {
         final StringBuilder healthOutput = new StringBuilder()
-                .append("Health Report:\n")
-                .append(PrettyDate.now())
-                .append("\nPing:\t\t\t")
-                .append(jda.getPing())
+                .append("Health Report:\t").append(PrettyDate.now())
+                .append("Ping:\t").append(jda.getPing())
                 .append("ms");
 
         LOGGER.info(healthOutput.toString());

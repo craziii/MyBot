@@ -21,8 +21,14 @@ public class MessageFilter {
 
     @Filter
     public boolean commandFilter(final Message message) {
-        if (isMyself(message) || isBot(message) || !isValidCommand(message)) {
-            LOGGER.info("Invalid message, ignoring");
+        if (isMyself(message)) {
+            LOGGER.info("Message from myself, ignoring");
+            return false;
+        } else if (isBot(message)) {
+            LOGGER.info("Message from another bot, ignoring");
+            return false;
+        } else if (!isValidCommand(message)) {
+            LOGGER.info("Invalid command message, ignoring");
             return false;
         }
         return true;

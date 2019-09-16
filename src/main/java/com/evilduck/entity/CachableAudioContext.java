@@ -3,11 +3,9 @@ package com.evilduck.entity;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.entities.Guild;
-import org.springframework.data.annotation.Id;
 
 public class CachableAudioContext {
 
-    @Id
     private final Guild guildId;
     private final AudioPlayer player;
     private final TrackScheduler trackScheduler;

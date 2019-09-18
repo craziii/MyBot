@@ -46,22 +46,25 @@ public class AudioPlayerSupport {
         return false;
     }
 
-    private static void displayPlayingTrack(final AudioTrack audioTrack,
-                                            final TextChannel textChannel) {
+    public String getTimeFormattedString(final long duration) {
+        final long hours = HOURS.convert(duration, MILLISECONDS);
+        final long minutes = MINUTES.convert(duration, MILLISECONDS) - (60 * hours);
+        final long seconds = SECONDS.convert(duration, MILLISECONDS) - (60 * minutes);
+        return hours > 1 ? format("%d:%02d:%02d", hours, minutes, seconds) :
+                format("%d:%02d", minutes, seconds);
+    }
+
+    private void displayPlayingTrack(final AudioTrack audioTrack,
+                                     final TextChannel textChannel) {
         if (audioTrack == null) {
             LOGGER.warn("Tried to display null audio track!");
         } else {
             final long duration = audioTrack.getDuration();
-            final long hours = HOURS.convert(duration, MILLISECONDS);
-            final long minutes = MINUTES.convert(duration, MILLISECONDS) - (60 * hours);
-            final long seconds = SECONDS.convert(duration, MILLISECONDS) - (60 * minutes);
 
             textChannel.sendMessage(new EmbedBuilder().setTitle("Queued Track")
                     .addField("Title", audioTrack.getInfo().title, false)
                     .addField("Origin", audioTrack.getInfo().uri, false)
-                    .addField("Duration", hours > 1 ?
-                                    format("%d:%02d:%02d", hours, minutes, seconds) :
-                                    format("%d:%02d", minutes, seconds),
+                    .addField("Duration", getTimeFormattedString(duration),
                             false)
                     .build())
                     .queue();

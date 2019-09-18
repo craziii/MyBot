@@ -5,6 +5,7 @@ import com.evilduck.command.interfaces.PublicCommand;
 import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.entity.CachableAudioContext;
+import com.evilduck.util.AudioPlayerSupport;
 import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -26,12 +27,15 @@ import static java.lang.String.format;
 public class Queue implements PublicCommand {
 
     private final CacheableAudioContextProvider audioContextProvider;
+    private final AudioPlayerSupport audioPlayerSupport;
     private final CommandHelper commandHelper;
 
     @Autowired
     public Queue(final CacheableAudioContextProvider audioContextProvider,
+                 final AudioPlayerSupport audioPlayerSupport,
                  final CommandHelper commandHelper) {
         this.audioContextProvider = audioContextProvider;
+        this.audioPlayerSupport = audioPlayerSupport;
         this.commandHelper = commandHelper;
     }
 
@@ -53,7 +57,9 @@ public class Queue implements PublicCommand {
                     .getPlayingTrack();
             if (playingTrack != null) {
                 final EmbedBuilder embedBuilder = new EmbedBuilder();
-                embedBuilder.addField("Currently Playing", playingTrack.getInfo().title, false);
+                embedBuilder.addField("Currently Playing", playingTrack.getInfo().title, false)
+                        .addField("Duration", audioPlayerSupport.getTimeFormattedString(playingTrack.getDuration()), false)
+                        .addBlankField(false);
                 final String trackUri = playingTrack.getInfo().uri;
                 embedBuilder.setThumbnail(trackUri.contains("youtu.be") || trackUri.contains("youtube") ?
                         format("https://img.youtube.com/vi/%s/0.jpg", playingTrack.getInfo().identifier) : null);
@@ -71,7 +77,9 @@ public class Queue implements PublicCommand {
                                     final EmbedBuilder embedBuilder) {
         int i = 2;
         for (final AudioTrack audioTrack : queue) {
-            embedBuilder.addField(i == 2 ? "Up Next" : "Track " + i, audioTrack.getInfo().title, false);
+            embedBuilder.addField(i == 2 ? "Up Next" : "Track " + i, audioTrack.getInfo().title, false)
+                    .addField("Duration", audioPlayerSupport.getTimeFormattedString(audioTrack.getDuration()), false)
+                    .addBlankField(false);
             i++;
         }
     }

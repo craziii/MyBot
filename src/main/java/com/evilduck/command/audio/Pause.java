@@ -4,6 +4,7 @@ import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PrivateCommand;
 import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,9 @@ public class Pause implements PrivateCommand {
     @Override
     @ServiceActivator(inputChannel = "pauseChannel")
     public void execute(Message message) {
-        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(message.getGuild()).getPlayer();
+        final Guild guild = message.getGuild();
+        final AudioPlayer audioPlayer = audioPlayerProvider.getAudioContextForGuild(guild).getPlayer();
         audioPlayer.setPaused(!audioPlayer.isPaused());
+//        audioPlayerProvider.persistAudioContextStateForGuild(guild, audioPlayer);
     }
 }

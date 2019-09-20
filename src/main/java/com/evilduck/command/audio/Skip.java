@@ -7,6 +7,7 @@ import com.evilduck.configuration.audio.TrackScheduler;
 import com.evilduck.entity.CachableAudioContext;
 import com.evilduck.util.AudioPlayerSupport;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,11 @@ public class Skip implements PrivateCommand {
     @Override
     @ServiceActivator(inputChannel = "skipChannel")
     public void execute(final Message message) {
-        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild());
+        final Guild guild = message.getGuild();
+        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
         audioPlayerSupport.next(message.getTextChannel(), audioPlayer, trackScheduler);
+//        audioContextProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
     }
 }

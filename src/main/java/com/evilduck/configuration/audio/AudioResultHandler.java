@@ -41,6 +41,7 @@ public class AudioResultHandler implements AudioLoadResultHandler {
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
         audioPlayerSupport.play(track, audioPlayer, trackScheduler, message.getTextChannel());
+        audioPlayerSupport.updateAudioContextForGuild(message.getGuild());
     }
 
 

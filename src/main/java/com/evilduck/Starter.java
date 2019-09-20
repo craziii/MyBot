@@ -1,6 +1,7 @@
 package com.evilduck;
 
 import com.evilduck.command.interfaces.IsACommand;
+import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.entity.CommandDetail;
 import com.evilduck.repository.BannedPhraseRepository;
@@ -39,6 +40,7 @@ public final class Starter {
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
     private final BannedPhraseRepository bannedPhraseRepository;
+    private final CacheableAudioContextProvider audioContextProvider;
     private final String commandPackagePath;
     private final JDA jda;
 
@@ -46,11 +48,13 @@ public final class Starter {
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
                    final BannedPhraseRepository bannedPhraseRepository,
+                   final CacheableAudioContextProvider audioContextProvider,
                    @Value("${command.package}") final String commandPackagePath,
                    final JDA jda) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
         this.bannedPhraseRepository = bannedPhraseRepository;
+        this.audioContextProvider = audioContextProvider;
         this.commandPackagePath = commandPackagePath;
         this.jda = jda;
     }
@@ -59,7 +63,6 @@ public final class Starter {
     public void init() {
         LOGGER.info("Deployment [15/09/2019 | 03:38]JeffBot is starting...");
         System.out.println(loadStartupText());
-
         final StringBuilder outputListString = new StringBuilder();
         for (final String defaultProfile : environment.getDefaultProfiles())
             outputListString.append(format("%s\n", defaultProfile));
@@ -67,6 +70,12 @@ public final class Starter {
 
         saveCommandDetailsFromClasses();
         saveBannedPhrases();
+    }
+
+    @PreDestroy
+    public void finishHooks() {
+//        audioContextProvider.
+//        jda.getGuilds().forEach(guild -> audioContextProvider.persistAudioContextStateForGuild(guild));
     }
 
     private void saveCommandDetailsFromClasses() {
@@ -92,12 +101,15 @@ public final class Starter {
     }
 
     private void saveBannedPhrases() {
-        final Optional<TextChannel> rulesChannel = jda.getTextChannels().stream().filter(textChannel -> textChannel.getName().toLowerCase().matches("rules")).findFirst();
+        final Optional<TextChannel> rulesChannel = jda.getTextChannels().stream()
+                .filter(textChannel -> textChannel.getName().toLowerCase().matches("rules")).findFirst();
         if (rulesChannel.isPresent()) {
             final List<Message> messages = rulesChannel.map(textChannel -> textChannel.getPinnedMessages().complete()).get();
-            final Optional<Message> bannedPhraseMessage = messages.stream().filter(message -> message.getContentRaw().toLowerCase().contains(":")).findFirst();
+            final Optional<Message> bannedPhraseMessage = messages.stream().filter(message -> message.getContentRaw().toLowerCase().contains(":"))
+                    .findFirst();
             if (bannedPhraseMessage.isPresent()) {
-                final String bannedPhraseList = bannedPhraseMessage.map(message -> message.getContentRaw().replace("```", "").substring(message.getContentRaw().indexOf(":") + 3)).get();
+                final String bannedPhraseList = bannedPhraseMessage
+                        .map(message -> message.getContentRaw().replace("```", "").substring(message.getContentRaw().indexOf(":") + 3)).get();
                 final List<String> split = asList(bannedPhraseList.split("\n"));
                 split.forEach(bannedPhrase -> bannedPhraseRepository.save(new BannedPhraseEntity(bannedPhrase.toLowerCase(), "testGuild")));
             }

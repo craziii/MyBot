@@ -1,9 +1,13 @@
 package com.evilduck.util;
 
+import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,30 +15,44 @@ import org.springframework.stereotype.Component;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Component
 public class AudioPlayerSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioPlayerSupport.class);
 
+    private final CacheableAudioContextProvider audioContextProvider;
+
+    public AudioPlayerSupport(final CacheableAudioContextProvider audioContextProvider) {
+        this.audioContextProvider = audioContextProvider;
+    }
+
     public void play(final AudioTrack audioTrack,
                      final AudioPlayer audioPlayer,
                      final TrackScheduler trackScheduler,
                      final TextChannel textChannel) {
         if (isEmptyTrack(textChannel, audioTrack)) return;
+        audioPlayer.addListener(new AudioEventListener() {
+            @Override
+            public void onEvent(AudioEvent event) {
+                System.out.println(event);
+//                audioContextProvider.persistAudioContextStateForGuild(textChannel.getGuild(), audioPlayer, trackScheduler);
+            }
+        });
         if (!audioPlayer.startTrack(audioTrack, true)) trackScheduler.offer(audioTrack);
         displayPlayingTrack(audioTrack, textChannel);
+    }
+
+    public void updateAudioContextForGuild(final Guild guild) {
+
     }
 
     public void next(final TextChannel textChannel,
                      final AudioPlayer audioPlayer,
                      final TrackScheduler trackScheduler) {
         final AudioTrack nextTrack = trackScheduler.getNextTrack();
-        if (!audioPlayer.startTrack(nextTrack, false)) textChannel.sendMessage("I had a problem playing the next track!").queue();
-        else displayPlayingTrack(nextTrack, textChannel);
+        if (audioPlayer.startTrack(nextTrack, false)) displayPlayingTrack(nextTrack, textChannel);
     }
 
     private boolean isEmptyTrack(final TextChannel textChannel,
@@ -47,11 +65,20 @@ public class AudioPlayerSupport {
     }
 
     public String getTimeFormattedString(final long duration) {
-        final long hours = HOURS.convert(duration, MILLISECONDS);
-        final long minutes = MINUTES.convert(duration, MILLISECONDS) - (60 * hours);
-        final long seconds = SECONDS.convert(duration, MILLISECONDS) - (60 * minutes);
-        return hours > 1 ? format("%d:%02d:%02d", hours, minutes, seconds) :
+        final long hours = duration / 3600000;
+        final long minutes = (duration / 60000) % 60;
+        final long seconds = (duration / 1000) % 60;
+        return hours > 0 ? format("%d:%02d:%02d", hours, minutes, seconds) :
                 format("%d:%02d", minutes, seconds);
+    }
+
+    public static void main(String... args) {
+        final long millis = (HOURS.toMillis(1) + MINUTES.toMillis(65) + 1000L);
+        final long hours = millis / 3600000;
+        final long minutes = (millis / 60000) % 60;
+        final long seconds = (millis / 1000) % 60;
+        System.out.println(format("%d:%02d:%02d", hours, minutes, seconds));
+
     }
 
     private void displayPlayingTrack(final AudioTrack audioTrack,

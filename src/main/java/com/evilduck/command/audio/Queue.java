@@ -58,7 +58,9 @@ public class Queue implements PublicCommand {
             if (playingTrack != null) {
                 final EmbedBuilder embedBuilder = new EmbedBuilder();
                 embedBuilder.addField("Currently Playing", playingTrack.getInfo().title, false)
-                        .addField("Duration", audioPlayerSupport.getTimeFormattedString(playingTrack.getDuration()), false)
+                        .addField("Current - Duration",
+                                audioPlayerSupport.getTimeFormattedString(playingTrack.getPosition()) + " - " +
+                                        audioPlayerSupport.getTimeFormattedString(playingTrack.getDuration()), false)
                         .addBlankField(false);
                 final String trackUri = playingTrack.getInfo().uri;
                 embedBuilder.setThumbnail(trackUri.contains("youtu.be") || trackUri.contains("youtube") ?

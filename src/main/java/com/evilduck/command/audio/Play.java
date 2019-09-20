@@ -15,6 +15,7 @@ import com.jecklgamis.util.Try;
 import com.jecklgamis.util.TryFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -68,7 +69,8 @@ public class Play implements GenericCommand, UnstableCommand {
     public void execute(final Message message) {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
-        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(message.getGuild());
+        final Guild guild = message.getGuild();
+        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(guild);
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         if (args.isEmpty() && audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
@@ -78,14 +80,25 @@ public class Play implements GenericCommand, UnstableCommand {
         } else {
             final Try<VoiceChannel> voiceChannelTry = getVoiceChannelByUserId(
                     message.getAuthor().getId(),
-                    message.getGuild().getVoiceChannels());
+                    guild.getVoiceChannels());
             if (voiceChannelTry.isFailure()) {
                 originChannel.sendMessage("I couldn't find you in any of the voice channels!").queue();
                 return;
             }
             final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
             startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get(), audioPlayer, trackScheduler);
+//            updateAudioPlayerContextOnTrackLoad(guild, audioPlayer, trackScheduler);
         }
+    }
+
+    private void updateAudioPlayerContextOnTrackLoad(final Guild guild,
+                                                     final AudioPlayer audioPlayer,
+                                                     final TrackScheduler trackScheduler) {
+        final int currentQueueSize = trackScheduler.queueLength();
+        audioPlayer.addListener(event -> {
+//            if (event instanceof TrackStartEvent || trackScheduler.queueLength() > currentQueueSize)
+//                audioPlayerProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
+        });
     }
 
     private void startPlayFromLink(final Message message,

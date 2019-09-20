@@ -3,9 +3,6 @@ package com.evilduck.entity;
 import org.springframework.data.annotation.Id;
 
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import static java.util.Arrays.asList;
 
 public class AudioContextState {
 
@@ -14,20 +11,15 @@ public class AudioContextState {
     private TrackState currentTrack;
     private Queue<String> queueIds;
 
+    public AudioContextState() {
+    }
+
     public AudioContextState(final String guildId,
                              final TrackState currentTrack,
                              final Queue<String> queueIds) {
         this.guildId = guildId;
         this.currentTrack = currentTrack;
         this.queueIds = queueIds;
-    }
-
-    public AudioContextState(final String guildId,
-                             final TrackState currentTrack,
-                             final String... queueIds) {
-        this.guildId = guildId;
-        this.currentTrack = currentTrack;
-        this.queueIds = new LinkedBlockingQueue<>(asList(queueIds));
     }
 
     public String getGuildId() {

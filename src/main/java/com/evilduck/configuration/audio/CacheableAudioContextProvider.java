@@ -29,14 +29,18 @@ public class CacheableAudioContextProvider {
     @Cacheable(value = "audio_player", key = "#guild.getId()")
     public CachableAudioContext getAudioContextForGuild(final Guild guild) {
         final AudioPlayer player = audioPlayerManagerAccessor.getAudioPlayerManager().createPlayer();
-        return new CachableAudioContext(guild, player);
+        final CachableAudioContext cachableAudioContext = new CachableAudioContext(guild, player);
+        player.addListener(new AudioPlayerContextListener(guild, cachableAudioContext.getPlayer(), cachableAudioContext.getTrackScheduler(), this));
+        return cachableAudioContext;
     }
 
-    public void persistAudioContextStateForGuild(final Guild guild) {
-        final CachableAudioContext audioContextForGuild = getAudioContextForGuild(guild);
-        final AudioTrack playingTrack = audioContextForGuild.getPlayer().getPlayingTrack();
+    public void persistAudioContextStateForGuild(final Guild guild,
+                                                 final AudioPlayer audioPlayer,
+                                                 final TrackScheduler trackScheduler) {
+        if (trackScheduler.queueLength() == 0 && audioPlayer.getPlayingTrack() == null) return;
+        final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
         final long currentPosition = playingTrack.getPosition();
-        final LinkedBlockingQueue<String> trackIds = audioContextForGuild.getTrackScheduler()
+        final LinkedBlockingQueue<String> trackIds = trackScheduler
                 .getQueue()
                 .stream()
                 .map(AudioTrack::getIdentifier)

@@ -23,7 +23,8 @@ public class AudioPlayerContextListener extends AudioEventAdapter {
     }
 
     @Override
-    public void onEvent(AudioEvent event) {
+    public void onEvent(final AudioEvent event) {
         audioContextProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
     }
+
 }

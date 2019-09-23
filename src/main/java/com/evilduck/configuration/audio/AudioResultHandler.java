@@ -6,7 +6,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 import org.slf4j.Logger;
@@ -16,18 +17,21 @@ public class AudioResultHandler implements AudioLoadResultHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioResultHandler.class);
 
-    private final Message message;
+    private final Guild guild;
+    private final TextChannel textChannel;
     private final VoiceChannel voiceChannel;
     private final AudioPlayer audioPlayer;
     private final TrackScheduler trackScheduler;
     private final AudioPlayerSupport audioPlayerSupport;
 
-    public AudioResultHandler(final Message message,
+    public AudioResultHandler(final Guild guild,
+                              final TextChannel textChannel,
                               final VoiceChannel voiceChannel,
                               final AudioPlayer audioPlayer,
                               final TrackScheduler trackScheduler,
                               final AudioPlayerSupport audioPlayerSupport) {
-        this.message = message;
+        this.guild = guild;
+        this.textChannel = textChannel;
         this.voiceChannel = voiceChannel;
         this.audioPlayer = audioPlayer;
         this.trackScheduler = trackScheduler;
@@ -37,11 +41,10 @@ public class AudioResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(final AudioTrack track) {
         LOGGER.info("Loaded Track: {}", track.getIdentifier());
-        final AudioManager audioManager = message.getTextChannel().getGuild().getAudioManager();
+        final AudioManager audioManager = guild.getAudioManager();
         audioManager.setSendingHandler(new AudioPlayerSendHandler(audioPlayer));
         audioManager.openAudioConnection(voiceChannel);
-        audioPlayerSupport.play(track, audioPlayer, trackScheduler, message.getTextChannel());
-        audioPlayerSupport.updateAudioContextForGuild(message.getGuild());
+        audioPlayerSupport.play(track, audioPlayer, trackScheduler, textChannel);
     }
 
 
@@ -61,10 +64,10 @@ public class AudioResultHandler implements AudioLoadResultHandler {
     @Override
     public void loadFailed(final FriendlyException exception) {
         LOGGER.info("Track Failed: {}", exception.toString());
-        message.getTextChannel()
-                .sendMessage("Failed to play track reason: ")
-                .append(exception.getLocalizedMessage())
-                .queue();
+        if (textChannel != null)
+            textChannel.sendMessage("Failed to play track reason: ")
+                    .append(exception.getLocalizedMessage())
+                    .queue();
     }
 
 }

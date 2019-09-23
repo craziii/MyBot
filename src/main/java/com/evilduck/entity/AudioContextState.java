@@ -2,22 +2,25 @@ package com.evilduck.entity;
 
 import org.springframework.data.annotation.Id;
 
-import java.util.Queue;
+import java.util.List;
 
 public class AudioContextState {
 
     @Id
     private String guildId;
+    private String voiceChannelId;
     private TrackState currentTrack;
-    private Queue<String> queueIds;
+    private List<String> queueIds;
 
     public AudioContextState() {
     }
 
     public AudioContextState(final String guildId,
+                             final String voiceChannelId,
                              final TrackState currentTrack,
-                             final Queue<String> queueIds) {
+                             final List<String> queueIds) {
         this.guildId = guildId;
+        this.voiceChannelId = voiceChannelId;
         this.currentTrack = currentTrack;
         this.queueIds = queueIds;
     }
@@ -26,11 +29,15 @@ public class AudioContextState {
         return guildId;
     }
 
+    public String getVoiceChannelId() {
+        return voiceChannelId;
+    }
+
     public TrackState getCurrentTrack() {
         return currentTrack;
     }
 
-    public Queue<String> getQueueIds() {
+    public List<String> getQueueIds() {
         return queueIds;
     }
 
@@ -38,27 +45,31 @@ public class AudioContextState {
         this.guildId = guildId;
     }
 
+    public void setVoiceChannelId(final String voiceChannelId) {
+        this.voiceChannelId = voiceChannelId;
+    }
+
     public void setCurrentTrack(final TrackState currentTrack) {
         this.currentTrack = currentTrack;
     }
 
-    public void setQueueIds(final Queue<String> queueIds) {
+    public void setQueueIds(final List<String> queueIds) {
         this.queueIds = queueIds;
     }
 
-    public boolean offerTrackId(final String id) {
-        return queueIds.offer(id);
+    public boolean addTrackId(final String id) {
+        return queueIds.add(id);
     }
 
-    public String pollTrackId(final String id) {
-        return queueIds.poll();
+    public void removeTrackId(final String id) {
+        queueIds.removeIf(trackId -> trackId.equals(id));
     }
 
     public static TrackState trackStateFor(final String id, final long position) {
         return new TrackState(id, position);
     }
 
-    private static class TrackState {
+    public static class TrackState {
         private final String id;
         private final long position;
 

@@ -41,16 +41,16 @@ public class Play implements GenericCommand, UnstableCommand {
 
     private final CommandHelper commandHelper;
     private final AudioPlayerSupport audioPlayerSupport;
-    private final CacheableAudioContextProvider audioPlayerProvider;
+    private final CacheableAudioContextProvider audioContextProvider;
     private final AudioPlayerManagerAccessor audioPlayerManagerAccessor;
 
     public Play(final CommandHelper commandHelper,
                 final AudioPlayerSupport audioPlayerSupport,
-                final CacheableAudioContextProvider audioPlayerProvider,
+                final CacheableAudioContextProvider audioContextProvider,
                 final AudioPlayerManagerAccessor audioPlayerManagerAccessor) {
         this.commandHelper = commandHelper;
         this.audioPlayerSupport = audioPlayerSupport;
-        this.audioPlayerProvider = audioPlayerProvider;
+        this.audioContextProvider = audioContextProvider;
         this.audioPlayerManagerAccessor = audioPlayerManagerAccessor;
     }
 
@@ -70,7 +70,7 @@ public class Play implements GenericCommand, UnstableCommand {
         final TextChannel originChannel = message.getTextChannel();
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final Guild guild = message.getGuild();
-        final CachableAudioContext audioContextForGuild = audioPlayerProvider.getAudioContextForGuild(guild);
+        final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         if (args.isEmpty() && audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
@@ -87,18 +87,8 @@ public class Play implements GenericCommand, UnstableCommand {
             }
             final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
             startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get(), audioPlayer, trackScheduler);
-//            updateAudioPlayerContextOnTrackLoad(guild, audioPlayer, trackScheduler);
+            audioContextProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
         }
-    }
-
-    private void updateAudioPlayerContextOnTrackLoad(final Guild guild,
-                                                     final AudioPlayer audioPlayer,
-                                                     final TrackScheduler trackScheduler) {
-        final int currentQueueSize = trackScheduler.queueLength();
-        audioPlayer.addListener(event -> {
-//            if (event instanceof TrackStartEvent || trackScheduler.queueLength() > currentQueueSize)
-//                audioPlayerProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
-        });
     }
 
     private void startPlayFromLink(final Message message,
@@ -109,7 +99,13 @@ public class Play implements GenericCommand, UnstableCommand {
         final boolean searchIsUri = search.matches(".*youtube\\.com/.*");
         final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
         final AudioPlayerManager audioPlayerManager = audioPlayerManagerAccessor.getAudioPlayerManager();
-        final AudioResultHandler resultHandler = new AudioResultHandler(message, voiceChannelTry, audioPlayer, trackScheduler, audioPlayerSupport);
+        final Guild guild = message.getGuild();
+        final AudioResultHandler resultHandler = new AudioResultHandler(guild,
+                message.getTextChannel(),
+                voiceChannelTry,
+                audioPlayer,
+                trackScheduler,
+                audioPlayerSupport);
         audioPlayerManager.loadItem((searchPrefix + search), resultHandler);
 
     }

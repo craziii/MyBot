@@ -1,7 +1,6 @@
 package com.evilduck;
 
 import com.evilduck.command.interfaces.IsACommand;
-import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.entity.BannedPhraseEntity;
 import com.evilduck.entity.CommandDetail;
 import com.evilduck.repository.BannedPhraseRepository;
@@ -40,7 +39,6 @@ public final class Starter {
     private final Environment environment;
     private final CommandDetailRepository commandDetailRepository;
     private final BannedPhraseRepository bannedPhraseRepository;
-    private final CacheableAudioContextProvider audioContextProvider;
     private final String commandPackagePath;
     private final JDA jda;
 
@@ -48,13 +46,11 @@ public final class Starter {
     public Starter(final Environment environment,
                    final CommandDetailRepository commandDetailRepository,
                    final BannedPhraseRepository bannedPhraseRepository,
-                   final CacheableAudioContextProvider audioContextProvider,
                    @Value("${command.package}") final String commandPackagePath,
                    final JDA jda) {
         this.environment = environment;
         this.commandDetailRepository = commandDetailRepository;
         this.bannedPhraseRepository = bannedPhraseRepository;
-        this.audioContextProvider = audioContextProvider;
         this.commandPackagePath = commandPackagePath;
         this.jda = jda;
     }

@@ -13,7 +13,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +44,7 @@ public class MusicRestarter {
     }
 
     @EventListener
-    public void restartAllGuilds(ApplicationReadyEvent event) {
+    public void restartAllGuilds(ContextStartedEvent event) {
         LOGGER.info("Received application ready event {}, Restarting audio contexts...", event);
         jda.getGuilds().forEach(guild -> repository.findById(guild.getId())
                 .ifPresent(audioContextState -> {

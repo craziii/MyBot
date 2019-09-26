@@ -11,6 +11,8 @@ import com.evilduck.util.AudioPlayerSupport;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,8 @@ import javax.annotation.PreDestroy;
 @Component
 public class MusicRestarter implements ApplicationListener<ApplicationReadyEvent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MusicRestarter.class);
+    
     private final JDA jda;
     private final AudioPlayerSupport audioPlayerSupport;
     private final AudioContextStateRepository repository;
@@ -45,6 +49,7 @@ public class MusicRestarter implements ApplicationListener<ApplicationReadyEvent
     }
 
     public void restartAllGuilds() {
+        LOGGER.info("Restarting audio contexts...");
         jda.getGuilds().forEach(guild -> repository.findById(guild.getId())
                 .ifPresent(audioContextState -> {
                     final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);

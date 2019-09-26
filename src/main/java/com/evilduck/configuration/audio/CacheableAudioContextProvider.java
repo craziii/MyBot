@@ -38,12 +38,8 @@ public class CacheableAudioContextProvider {
     @Cacheable(value = "audio_player", key = "#guild.getId()")
     public CachableAudioContext getAudioContextForGuild(final Guild guild) {
         final AudioPlayer player = audioPlayerManagerAccessor.getAudioPlayerManager().createPlayer();
-        final CachableAudioContext cachableAudioContext = new CachableAudioContext(guild, player);
-        player.addListener(new AudioPlayerContextListener(guild,
-                cachableAudioContext.getPlayer(),
-                cachableAudioContext.getTrackScheduler(),
-                this));
-        return cachableAudioContext;
+        player.addListener(new AudioPlayerContextListener(guild, player, audioContextStateRepository));
+        return new CachableAudioContext(guild, player);
     }
 
     public void persistAudioContextStateForGuild(final Guild guild,

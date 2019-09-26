@@ -15,6 +15,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
+
 @Component
 public class MusicRestarter implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -43,16 +45,33 @@ public class MusicRestarter implements ApplicationListener<ApplicationReadyEvent
     }
 
     public void restartAllGuilds() {
+        jda.getGuilds().forEach(guild -> repository.findById(guild.getId())
+                .ifPresent(audioContextState -> {
+                    final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
+                    final AudioPlayer player = audioContextForGuild.getPlayer();
+                    final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
+                    restartTrackFromContext(
+                            guild,
+                            audioContextState,
+                            player,
+                            trackScheduler,
+                            audioContextState.getCurrentTrack().getId());
+                    audioContextState.getQueueIds().forEach(id ->
+                            restartTrackFromContext(guild, audioContextState, player, trackScheduler, id));
+                }));
+    }
+
+    @PreDestroy
+    public void finishHooks() {
         jda.getGuilds().forEach(guild -> {
-            repository.findById(guild.getId()).ifPresent(audioContextState -> {
-                final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
-                final AudioPlayer player = audioContextForGuild.getPlayer();
-                final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
-                restartTrackFromContext(guild, audioContextState, player, trackScheduler, audioContextState.getCurrentTrack().getId());
-                audioContextState.getQueueIds().forEach(id -> audioPlayerSupport);
-            });
+            final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
+            audioContextProvider.persistAudioContextStateForGuild(
+                    guild,
+                    audioContextForGuild.getPlayer(),
+                    audioContextForGuild.getTrackScheduler());
         });
     }
+
 
     private void restartTrackFromContext(final Guild guild,
                                          final AudioContextState audioContextState,

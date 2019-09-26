@@ -68,12 +68,6 @@ public final class Starter {
         saveBannedPhrases();
     }
 
-    @PreDestroy
-    public void finishHooks() {
-//        audioContextProvider.
-//        jda.getGuilds().forEach(guild -> audioContextProvider.persistAudioContextStateForGuild(guild));
-    }
-
     private void saveCommandDetailsFromClasses() {
         System.out.println("\n ========== ========== ========== ========== ==========\n");
         LOGGER.info("Loading command Classes from path: \'{}\'", commandPackagePath);

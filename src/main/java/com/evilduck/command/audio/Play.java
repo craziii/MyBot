@@ -87,7 +87,6 @@ public class Play implements GenericCommand, UnstableCommand {
             }
             final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
             startPlayFromLink(message, commandHelper.getArgsAsAString(args, 0), voiceChannelTry.get(), audioPlayer, trackScheduler);
-            audioContextProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
         }
     }
 

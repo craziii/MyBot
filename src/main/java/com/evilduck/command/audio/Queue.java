@@ -10,6 +10,7 @@ import com.evilduck.util.CommandHelper;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
@@ -45,9 +46,10 @@ public class Queue implements PublicCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(message.getGuild());
         final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
+        final TextChannel textChannel = message.getTextChannel();
         if (!args.isEmpty()) {
             if (args.get(0).toLowerCase().matches("clear|empty|dump")) {
-                message.getTextChannel().sendMessage("Queue has been cleared!").queue();
+                textChannel.sendMessage("Queue has been cleared!").queue();
                 trackScheduler.clear();
             }
         } else {
@@ -67,12 +69,9 @@ public class Queue implements PublicCommand {
                         format("https://img.youtube.com/vi/%s/0.jpg", playingTrack.getInfo().identifier) : null);
                 populateQueueEmbed(queue, embedBuilder);
                 embedBuilder.setTitle("Current Queue");
-                message.getTextChannel().sendMessage(embedBuilder.build()).queue();
-            }
-
+                textChannel.sendMessage(embedBuilder.build()).queue();
+            } else if (queue.isEmpty()) textChannel.sendMessage("The queue is empty, maybe play something I dunno").queue();
         }
-
-
     }
 
     private void populateQueueEmbed(final LinkedBlockingQueue<AudioTrack> queue,

@@ -96,7 +96,13 @@ public class Play implements GenericCommand, UnstableCommand {
                                    final AudioPlayer audioPlayer,
                                    final TrackScheduler trackScheduler) {
         final boolean searchIsUri = search.matches(".*youtube\\.com/.*");
-        final String searchPrefix = searchIsUri ? "" : "ytsearch: ";
+        final String searchPrefix;
+        if (search.matches(".*\\.pls") || search.matches(".*\\.m3u")) {
+            searchPrefix = "";
+        } else {
+            searchPrefix = searchIsUri ? "" : "ytsearch: ";
+        }
+
         final AudioPlayerManager audioPlayerManager = audioPlayerManagerAccessor.getAudioPlayerManager();
         final Guild guild = message.getGuild();
         final AudioResultHandler resultHandler = new AudioResultHandler(guild,
@@ -106,7 +112,6 @@ public class Play implements GenericCommand, UnstableCommand {
                 trackScheduler,
                 audioPlayerSupport);
         audioPlayerManager.loadItem((searchPrefix + search), resultHandler);
-
     }
 
     private static Try<VoiceChannel> getVoiceChannelByUserId(final String id,

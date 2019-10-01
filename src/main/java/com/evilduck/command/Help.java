@@ -37,7 +37,7 @@ public class Help implements PublicCommand {
             final int nextStepEnd = (nextStepStart + 4);
             final List<CommandDetail> nextEmbedGroup = commandDetailList.subList(
                     nextStepStart,
-                    (nextStepEnd > noOfCommands) ? noOfCommands : nextStepEnd);
+                    Math.min(nextStepEnd, noOfCommands));
             final EmbedBuilder helpEmbed = new EmbedBuilder()
                     .setTitle(String.format("%d | JeffBot Command List!", nextStepEnd / 4));
             nextEmbedGroup.forEach(addCommandDetailToEmbed(helpEmbed));

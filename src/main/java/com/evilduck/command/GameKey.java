@@ -5,30 +5,34 @@ import com.evilduck.command.interfaces.PublicCommand;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
-import static java.lang.Integer.parseInt;
 import static org.joda.time.DateTime.now;
 
 @Component
-@IsACommand(description = "Used to display a message (usually a steam key) after some time delay ", tutorial = "Use !steamkey with your message", aliases = {"sk"})
-public class SteamKey implements PublicCommand {
+@IsACommand(description = "Used to display a message (usually a steam key) after some time delay ",
+            tutorial = "Use !gamekey with the **place it can be redeemed**, " +
+                    "**the key** and then **how long** you wish for it to be " +
+                    "displayed (blank for forever) *(e.g. !gamekey gog hdy28-jdsig-dsj3s 30)*", aliases = {"gk"})
+public class GameKey implements PublicCommand {
 
     private static final int COUNTDOWN_DELAY = 10;
 
     private final CommandHelper commandHelper;
 
-    public SteamKey(final CommandHelper commandHelper) {
+    public GameKey(final CommandHelper commandHelper) {
         this.commandHelper = commandHelper;
     }
 
     @Override
-    @ServiceActivator(inputChannel = "steamKeyChannel")
+    @ServiceActivator(inputChannel = "gameKeyChannel")
     public void execute(Message message) {
         final MessageChannel originChannel = message.getTextChannel();
 
@@ -38,16 +42,24 @@ public class SteamKey implements PublicCommand {
             return;
         }
 
-        final String steamKey = args.get(0);
-        final int expiry = args.size() > 1 ? parseInt(args.get(1)) : -1;
+        final String key = args.stream()
+                .filter(cs -> !StringUtils.isNumeric(cs))
+                .map(v -> v + " ")
+                .collect(Collectors.joining(" "));
+
+        final int expiry = args.stream()
+                .filter(StringUtils::isNumeric)
+                .map(Integer::parseInt)
+                .findFirst()
+                .orElse(-1);
 
         originChannel.deleteMessageById(message.getId()).queue();
-        final String messageId = originChannel.sendMessage("@here Dropping steam key in: " + 10 + "s...").complete().getId();
+        final String messageId = originChannel.sendMessage("@here Dropping game key in: " + 30 + "s...").complete().getId();
 
         final Timer timer = new Timer();
 
         for (int i = COUNTDOWN_DELAY; i >= 0; i--)
-            timer.schedule(new SteamKeyCountDown(originChannel, messageId, i, steamKey),
+            timer.schedule(new SteamKeyCountDown(originChannel, messageId, i, key),
                     now().plusSeconds(COUNTDOWN_DELAY - i).toDate());
 
         if (expiry > 0)
@@ -76,7 +88,7 @@ public class SteamKey implements PublicCommand {
         public void run() {
             messageChannel.getMessageById(messageId)
                     .complete()
-                    .editMessage(countDownTimer == 0 ? "Here is the steam key!\n```" + key + "```\n" : "@here Dropping steam key in: " + countDownTimer + "s...")
+                    .editMessage(countDownTimer == 0 ? "Here is the game key!\n```" + key + "```\n" : "@here Dropping steam key in: " + countDownTimer + "s...")
                     .queue();
         }
     }

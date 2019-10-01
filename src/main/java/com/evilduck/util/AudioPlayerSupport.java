@@ -1,6 +1,5 @@
 package com.evilduck.util;
 
-import com.evilduck.configuration.audio.CacheableAudioContextProvider;
 import com.evilduck.configuration.audio.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -16,12 +15,6 @@ import static java.lang.String.format;
 public class AudioPlayerSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AudioPlayerSupport.class);
-
-    private final CacheableAudioContextProvider audioContextProvider;
-
-    public AudioPlayerSupport(final CacheableAudioContextProvider audioContextProvider) {
-        this.audioContextProvider = audioContextProvider;
-    }
 
     public void play(final AudioTrack audioTrack,
                      final AudioPlayer audioPlayer,

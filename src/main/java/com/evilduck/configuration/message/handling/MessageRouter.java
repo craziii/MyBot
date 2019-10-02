@@ -2,6 +2,7 @@ package com.evilduck.configuration.message.handling;
 
 import com.evilduck.entity.CommandDetail;
 import com.evilduck.exception.MatchedTooManyCommandsException;
+import com.evilduck.repository.PollSessionRepository;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -19,11 +20,14 @@ public class MessageRouter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageRouter.class);
 
     private final CommandHelper commandHelper;
+    private final PollSessionRepository pollSessionRepository;
 
 
     @Autowired
-    public MessageRouter(final CommandHelper commandHelper) {
+    public MessageRouter(final CommandHelper commandHelper,
+                         final PollSessionRepository pollSessionRepository) {
         this.commandHelper = commandHelper;
+        this.pollSessionRepository = pollSessionRepository;
     }
 
     @Router
@@ -34,10 +38,16 @@ public class MessageRouter {
             return matchedCommands.get(0).getFullCommand() + "Channel";
         else if (matchedCommands.size() > 1) {
             return "errorChannel";
+        } else if (hasPollSession(message)) {
+            return "pollChannel";
         } else {
             LOGGER.info("No explicit Commands matched, checking AutoFire Commands.");
             return "autoFireCommandChannel";
         }
+    }
+
+    private final boolean hasPollSession(final org.springframework.messaging.Message<Message> message) {
+        return pollSessionRepository.findById(message.getPayload().getAuthor().getDiscriminator()).isPresent();
     }
 
     private static String informOfMatchedCommands(final org.springframework.messaging.Message<Message> message,

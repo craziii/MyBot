@@ -1,7 +1,5 @@
 package com.evilduck.configuration.message.handling;
 
-import com.evilduck.entity.Prefix;
-import com.evilduck.exception.MissingPrefixException;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.SelfUser;
@@ -36,8 +34,6 @@ public class CommandFormatter {
         final net.dv8tion.jda.core.entities.Message payload = message.getPayload();
         final String selfMention = jda.getSelfUser().getAsMention();
         final String newContent = payload.getContentRaw().replaceFirst(selfMention + " ?", "!");
-        final Prefix defaultPrefix = new Prefix("!");
-        if (!defaultPrefix.matches(newContent)) throw new MissingPrefixException();
 
         final MutableMessage newMessage = new MutableMessage(payload, newContent);
 

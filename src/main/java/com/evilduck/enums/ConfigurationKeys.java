@@ -1,4 +1,4 @@
-package com.evilduck.Enum;
+package com.evilduck.enums;
 
 public enum ConfigurationKeys {
 

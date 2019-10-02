@@ -40,7 +40,7 @@ public class Skip implements PrivateCommand {
         final CachableAudioContext audioContextForGuild = audioContextProvider.getAudioContextForGuild(guild);
         final AudioPlayer audioPlayer = audioContextForGuild.getPlayer();
         final TrackScheduler trackScheduler = audioContextForGuild.getTrackScheduler();
-        audioPlayerSupport.next(message.getTextChannel(), audioPlayer, trackScheduler);
+        audioPlayer.stopTrack();
 //        audioContextProvider.persistAudioContextStateForGuild(guild, audioPlayer, trackScheduler);
     }
 }

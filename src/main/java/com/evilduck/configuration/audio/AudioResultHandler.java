@@ -47,7 +47,6 @@ public class AudioResultHandler implements AudioLoadResultHandler {
         audioPlayerSupport.play(track, audioPlayer, trackScheduler, textChannel);
     }
 
-
     @Override
     public void playlistLoaded(final AudioPlaylist playlist) {
         LOGGER.info("Loaded Playlist {}, containing {} tracks",

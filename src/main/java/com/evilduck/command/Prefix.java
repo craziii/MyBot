@@ -1,10 +1,10 @@
 package com.evilduck.command;
 
-import com.evilduck.Enum.ConfigurationKeys;
 import com.evilduck.command.interfaces.IsACommand;
 import com.evilduck.command.interfaces.PrivateCommand;
 import com.evilduck.command.interfaces.UnstableCommand;
 import com.evilduck.entity.Configuration;
+import com.evilduck.enums.ConfigurationKeys;
 import com.evilduck.repository.ConfigurationRepository;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.entities.Member;

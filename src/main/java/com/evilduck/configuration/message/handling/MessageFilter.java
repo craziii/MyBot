@@ -1,10 +1,12 @@
 package com.evilduck.configuration.message.handling;
 
 
+import com.evilduck.repository.PollSessionRepository;
 import com.evilduck.repository.SimpleConfigurationRepository;
 import net.dv8tion.jda.core.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.Filter;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +15,13 @@ public class MessageFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilter.class);
 
+    private final PollSessionRepository pollSessionRepository;
     private final SimpleConfigurationRepository configurationRepository;
 
-    public MessageFilter(final SimpleConfigurationRepository configurationRepository) {
+    @Autowired
+    public MessageFilter(final PollSessionRepository pollSessionRepository,
+                         final SimpleConfigurationRepository configurationRepository) {
+        this.pollSessionRepository = pollSessionRepository;
         this.configurationRepository = configurationRepository;
     }
 
@@ -27,11 +33,17 @@ public class MessageFilter {
         } else if (isBot(message)) {
             LOGGER.info("Message from another bot, ignoring");
             return false;
-        } else if (!isValidCommand(message)) {
-            LOGGER.info("Invalid command message, ignoring");
-            return false;
+        } else if (isValidCommand(message)) {
+            return true;
+        } else if (hasPollSession(message)) {
+            LOGGER.info("User {} has a poll session", message.getAuthor());
+            return true;
         }
         return true;
+    }
+
+    private boolean hasPollSession(final Message payload) {
+        return pollSessionRepository.findById(payload.getAuthor().getDiscriminator()).isPresent();
     }
 
     private boolean isValidCommand(final Message payload) {

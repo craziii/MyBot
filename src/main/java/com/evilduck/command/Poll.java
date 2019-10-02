@@ -7,7 +7,6 @@ import com.evilduck.repository.ResponseSessionRepository;
 import com.evilduck.session.PollSession;
 import com.evilduck.session.ResponseSession;
 import com.evilduck.util.CommandHelper;
-import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageReaction;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.evilduck.enums.AlphabetEmojis.unicodeForLetter;
 import static com.evilduck.util.TextColorPrefix.GREEN;
 import static com.evilduck.util.TextColorPrefix.ORANGE;
 import static com.evilduck.util.TextColorPrefix.RED;
@@ -42,19 +41,7 @@ public class Poll implements PublicCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(Poll.class);
 
     private static final String CANCEL_REGEX = "(REMOVE|DELETE|STOP|CANCEL)";
-    private static final HashMap NUMBER_EMOJIS = new HashMap<Integer, String>() {{
-        put(0, ":zero:");
-        put(1, ":one:");
-        put(2, ":two:");
-        put(3, ":three:");
-        put(4, ":four:");
-        put(5, ":five:");
-        put(6, ":six:");
-        put(7, ":seven:");
-        put(8, ":eight:");
-        put(9, ":nine:");
-    }};
-
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwyz";
     private final ResponseSessionRepository responseSessionRepository;
     private final PollSessionRepository pollSessionRepository;
     private final CommandHelper commandHelper;
@@ -76,10 +63,13 @@ public class Poll implements PublicCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final String firstArg = args.size() > 0 ? args.get(0) : "";
 
-        if (responseSessionRepository.findById(userId).isPresent() && userPoll.isPresent())
+        if (isCancelCommand(firstArg)) {
+            deletePoll(message, userId);
+            LOGGER.info("User {} has deleted their poll", userId);
+        } else if (responseSessionRepository.findById(userId).isPresent() && userPoll.isPresent())
             startPoll(message, userId, userPoll.get());
-        else if (userPoll.isPresent() || isCancelCommand(firstArg)) existingPollActions(message, userId);
-        else createPoll(message, userId);
+        else if (args.size() > 1) createPoll(message, userId);
+        else message.getTextChannel().sendMessage("You must set two or more items for a poll").queue();
     }
 
     private static boolean isCancelCommand(final String command) {
@@ -93,8 +83,7 @@ public class Poll implements PublicCommand {
 
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         if (args.size() > 0 && isCancelCommand(args.get(0))) {
-            deletePoll(message, userId);
-            LOGGER.info("User {} has deleted their poll", discriminator);
+
         } else {
             // Reckon I could format this better, but I don't know how....
             message.getTextChannel()
@@ -119,7 +108,8 @@ public class Poll implements PublicCommand {
         final EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(message.getAuthor().getName() + "'s Poll");
         final Map<String, Integer> options = newPoll.getOptions();
         final List<String> optionsKeys = new ArrayList<>(options.keySet());
-        for (int i = 0; i < options.size(); i++) embedBuilder.addField(String.valueOf(i), optionsKeys.get(i), true);
+        for (int i = 0; i < options.size(); i++)
+            embedBuilder.addField(String.valueOf(i), optionsKeys.get(i).replace("cancel", "fuck you dean"), true);
         embedBuilder.setDescription("Vote via the reaction icons below");
 
         message.getTextChannel().sendMessage(embedBuilder.build()).queue(
@@ -130,7 +120,7 @@ public class Poll implements PublicCommand {
 
     private void pollShowSuccess(PollSession actualPoll, Message success) {
         for (int i = 0; i < actualPoll.getOptions().size(); i++)
-            success.addReaction(EmojiParser.parseToUnicode((String) NUMBER_EMOJIS.get(i))).queue();
+            success.addReaction(unicodeForLetter(ALPHABET.charAt(i))).queue();
         actualPoll.setMessageId(success.getId());
         pollSessionRepository.save(actualPoll);
         LOGGER.info("Successfully started poll!");

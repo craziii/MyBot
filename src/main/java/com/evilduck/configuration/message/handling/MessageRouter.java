@@ -2,7 +2,7 @@ package com.evilduck.configuration.message.handling;
 
 import com.evilduck.entity.CommandDetail;
 import com.evilduck.exception.MatchedTooManyCommandsException;
-import com.evilduck.repository.PollSessionRepository;
+import com.evilduck.repository.SessionRepository;
 import com.evilduck.util.CommandHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -20,14 +20,13 @@ public class MessageRouter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageRouter.class);
 
     private final CommandHelper commandHelper;
-    private final PollSessionRepository pollSessionRepository;
-
+    private final SessionRepository sessionRepository;
 
     @Autowired
     public MessageRouter(final CommandHelper commandHelper,
-                         final PollSessionRepository pollSessionRepository) {
+                         final SessionRepository sessionRepository) {
         this.commandHelper = commandHelper;
-        this.pollSessionRepository = pollSessionRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     @Router
@@ -36,18 +35,18 @@ public class MessageRouter {
         final List<CommandDetail> matchedCommands = commandHelper.matchCommandString(getCommandString(rawCommand));
         if (matchedCommands.size() == 1)
             return matchedCommands.get(0).getFullCommand() + "Channel";
-        else if (matchedCommands.size() > 1) {
+        else if (matchedCommands.size() > 1)
             return "errorChannel";
-        } else if (hasPollSession(message)) {
-            return "pollChannel";
-        } else {
+        else if (hasSession(message))
+            return "sessionHandlerChannel";
+        else {
             LOGGER.info("No explicit Commands matched, checking AutoFire Commands.");
             return "autoFireCommandChannel";
         }
     }
 
-    private final boolean hasPollSession(final org.springframework.messaging.Message<Message> message) {
-        return pollSessionRepository.findById(message.getPayload().getAuthor().getDiscriminator()).isPresent();
+    private boolean hasSession(final org.springframework.messaging.Message<Message> message) {
+        return sessionRepository.findById(message.getPayload().getAuthor().getId()).isPresent();
     }
 
     private static String informOfMatchedCommands(final org.springframework.messaging.Message<Message> message,

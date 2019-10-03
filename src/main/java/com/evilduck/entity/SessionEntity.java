@@ -5,38 +5,61 @@ import org.springframework.data.annotation.Id;
 public class SessionEntity {
 
     @Id
-    private String id;
+    private String authorId;
+    private String nextStep;
+    private String messageId;
+    private String sessionType;
+    private SessionDetail sessionDetail;
 
-    private String savedDetail;
-
-    public SessionEntity(final String id,
-                         final String savedDetail) {
-        this.id = id;
-        this.savedDetail = savedDetail;
+    public SessionEntity(final String authorId,
+                         final String nextStep,
+                         final String messageId,
+                         final String sessionType, SessionDetail sessionDetail) {
+        this.authorId = authorId;
+        this.nextStep = nextStep;
+        this.messageId = messageId;
+        this.sessionType = sessionType;
+        this.sessionDetail = sessionDetail;
     }
 
-    public String getId() {
-        return id;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAuthorId(final String authorId) {
+        this.authorId = authorId;
     }
 
-    public String getSavedDetail() {
-        return savedDetail;
+    public String getNextStep() {
+        return nextStep;
     }
 
-    public void setSavedDetail(String savedDetail) {
-        this.savedDetail = savedDetail;
+    public void setNextStep(final String nextStep) {
+        this.nextStep = nextStep;
     }
 
-    @Override
-    public String toString() {
-        return "SessionEntity{" +
-                "id='" + id + '\'' +
-                ", savedDetail='" + savedDetail + '\'' +
-                '}';
+    public String getMessageId() {
+        return messageId;
     }
 
+    public void setMessageId(final String messageId) {
+
+        this.messageId = messageId;
+    }
+
+    public String getSessionType() {
+        return sessionType;
+    }
+
+    public void setSessionType(final String sessionType) {
+        this.sessionType = sessionType;
+    }
+
+    public SessionDetail getSessionDetail() {
+        return sessionDetail;
+    }
+
+    public void setSessionDetail(final SessionDetail sessionDetail) {
+        this.sessionDetail = sessionDetail;
+    }
 }

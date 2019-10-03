@@ -55,15 +55,10 @@ public class TestCommand implements PublicCommand, UnstableCommand, PrivateComma
         if (session.isPresent()) {
             message.getTextChannel()
                     .sendMessage("I have found a session for you!\nYou saved: " +
-                            session.get().getSavedDetail())
+                            session.get().getNextStep())
                     .queue();
-            sessionRepository.deleteById(session.get().getId());
+            sessionRepository.deleteById(session.get().getAuthorId());
         } else {
-            if (commandHelper.getArgs(rawMessage).get(0).equalsIgnoreCase("save"))
-                sessionRepository.save(new SessionEntity(
-                        message.getMember().getUser().getId(),
-                        commandHelper.getArgsAsString(rawMessage, 2)
-                ));
         }
 
     }

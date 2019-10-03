@@ -7,9 +7,9 @@ import java.util.Map;
 public class PollSession {
 
     @Id
-    private final String memberId;
+    private String memberId;
     private String messageId;
-    private final Map<String, Integer> options;
+    private Map<String, Integer> options;
 
 
     public PollSession(final String memberId,

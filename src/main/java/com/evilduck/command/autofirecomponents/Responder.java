@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -42,7 +41,6 @@ public class Responder implements GenericCommand {
         if (session.isPresent()) {
             // How might I get this to work...?
             final String channelName = session.get().getCommandName() + "Channel";
-            pollChannel.send(MessageBuilder.withPayload(message).build());
         } else {
             logger.info("No sessions found for user");
         }

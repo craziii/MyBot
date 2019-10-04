@@ -33,7 +33,7 @@ public class PollFinisher extends TimerTask {
     @Override
     public void run() {
         final EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Poll finished! Here are the results...");
+        builder.setTitle("Poll finished! Here are the results for \"" + pollOptions.getQuestion() + "\"");
         final Message pollMessage = textChannel.getMessageById(messageId).complete();
         final List<MessageReaction> reactions = pollMessage.getReactions();
         for (int i = 0; i < reactions.size(); i++) {

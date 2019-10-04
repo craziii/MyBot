@@ -42,13 +42,14 @@ public class Poll implements PublicCommand {
         final List<String> args = commandHelper.getArgs(message.getContentRaw());
         final String firstArg = args.size() > 0 ? args.get(0) : "";
 
+        final boolean hasQuestion = hasQuestion(message.getContentRaw());
+
         if (isCancelCommand(firstArg)) {
             deletePoll(message, userId);
             LOGGER.info("User {} has deleted their poll", userId);
         } else if (userPoll.isPresent())
             message.getTextChannel().sendMessage("You already have a poll, please enter the number of minutes it should last").queue();
-        else if (args.size() > 1) createPoll(message);
-        else message.getTextChannel().sendMessage("You must set two or more items for a poll").queue();
+        else createPoll(message);
     }
 
     private static boolean isCancelCommand(final String command) {
@@ -65,6 +66,10 @@ public class Poll implements PublicCommand {
                     .split("[?]");
             question = questionOptions[0];
             args = commandHelper.getArgs(questionOptions[1]);
+            if (args.size() == 1) {
+                message.getTextChannel().sendMessage("You must set two or more items for a poll").queue();
+                return null;
+            }
         } else {
             args = commandHelper.getArgs(message.getContentRaw());
             question = null;
@@ -78,6 +83,7 @@ public class Poll implements PublicCommand {
 
     private void createPoll(final Message message) {
         final SessionEntity session = createNewPoll(message);
+        if (session == null) return;
         message.getTextChannel().sendMessage(
                 "How many minutes should this poll last?")
                 .queue();

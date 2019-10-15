@@ -46,7 +46,11 @@ public class Volume implements PrivateCommand {
 
         final int currentVolume = audioPlayer.getVolume();
         if (args.isEmpty()) {
-            originChannel.sendMessage("Current volume is " + currentVolume).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Current volume is " + currentVolume + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Current volume is " + currentVolume).queue();
+            }
             return;
         }
 
@@ -56,22 +60,42 @@ public class Volume implements PrivateCommand {
 
         if (volumeOperator.isAddition()) {
             audioPlayer.setVolume(getValidVolume(currentVolume + operatedVolume));
-            originChannel.sendMessage("Volume increased by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Volume increased by " + operatedVolume + " to " + audioPlayer.getVolume() + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Volume increased by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            }
         } else if (volumeOperator.isSubtraction()) {
             audioPlayer.setVolume(getValidVolume(currentVolume - operatedVolume));
-            originChannel.sendMessage("Volume decreased by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Volume decreased by " + operatedVolume + " to " + audioPlayer.getVolume() + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Volume decreased by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            }
         } else if (volumeOperator.isDivision()) {
             if (operatedVolume <= 0) {
                 originChannel.sendMessage("Please do not try to get me to divide by zero, it hurts my circuits").queue();
                 return;
             }
             audioPlayer.setVolume(getValidVolume(currentVolume / operatedVolume));
-            originChannel.sendMessage("Volume divided by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Volume divided by " + operatedVolume + " to " + audioPlayer.getVolume() + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Volume divided by " + operatedVolume + " to " + audioPlayer.getVolume()).queue();
+            }
         } else if (volumeOperator.isMultiplication()) {
-            originChannel.sendMessage("Nice try buddy! Current volume is " + audioPlayer.getVolume()).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Nice try buddy! Current volume is " + audioPlayer.getVolume() + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Nice try buddy! Current volume is " + audioPlayer.getVolume()).queue();
+            }
         } else {
             audioPlayer.setVolume(getValidVolume(parseInt(volumeString)));
-            originChannel.sendMessage("Volume set to " + audioPlayer.getVolume()).queue();
+            if (currentVolume == 69) {
+                originChannel.sendMessage("Volume set to " + audioPlayer.getVolume() + ". Nice.").queue();
+            } else {
+                originChannel.sendMessage("Volume set to " + audioPlayer.getVolume()).queue();
+            }
         }
 
     }
